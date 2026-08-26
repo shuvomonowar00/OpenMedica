@@ -14,7 +14,7 @@ Use this document to track project progress. Update it whenever a task is comple
 - [x] Create `Dockerfile` for Backend and Frontend, and root `docker-compose.yml`
 
 ## Phase 3: Backend - Core API & Data (CURRENT)
-- [ ] Set up FastAPI scaffold (`backend/main.py`)
+- [x] Set up FastAPI scaffold (`backend/main.py`)
 - [ ] Implement `backend/pubmed_fetcher.py` using Biopython
 - [ ] Implement Model Agnostic Factory (`backend/llm_factory.py`)
 
@@ -25,4 +25,4 @@ Use this document to track project progress. Update it whenever a task is comple
 ## Phase 5: Frontend - Streamlit UI
 - [ ] Implement `frontend/app.py` with REST calls to FastAPI backend
 
-**Current Task**: We are on Phase 3 (Backend - Core API & Data). Next step is to set up the FastAPI scaffold.
+**Current Task**: We are on Phase 3 (Backend - Core API & Data). Next step is to implement `backend/pubmed_fetcher.py` using Biopython.

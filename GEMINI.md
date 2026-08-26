@@ -1,4 +1,4 @@
-﻿# OpenMedica AI Assistant Rules
+# OpenMedica AI Assistant Rules
 
 You are an AI coding assistant working on the OpenMedica project. 
 
@@ -10,8 +10,9 @@ Every time you start a new session or are asked a question, you MUST silently re
 
 ## Strict Constraints
 - NEVER hallucinate medical data.
-- NEVER mix frontend and backend code. Use the rontend/ and ackend/ directories strictly.
+- NEVER mix frontend and backend code. Use the frontend/ and backend/ directories strictly.
 - Always output clean, modular Python code based ONLY on the approved tech stack in 09_tech_stack.md.
+- **Code Quality**: You MUST follow the coding standards defined in `doc/10_coding_guidelines.md` whenever writing or modifying code.
 - Update doc/01_current_state.md automatically when you complete a task.
 
 Do not read other markdown files in the doc/ folder unless the current task explicitly requires it (to save context tokens).
