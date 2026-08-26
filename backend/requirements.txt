@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+biopython
+chromadb
+pydantic-ai
+google-genai
