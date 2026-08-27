@@ -3,8 +3,10 @@ OpenMedica - API Router
 Contains the core REST endpoints for the application.
 """
 from fastapi import APIRouter, HTTPException
-from schemas import IngestRequest, IngestResponse, ChatRequest, ChatResponse
-from pubmed_fetcher import fetch_abstracts
+from models.schemas import IngestRequest, IngestResponse, ChatRequest, ChatResponse
+from services.pubmed_fetcher import fetch_abstracts
+from services.vector_store import vector_store
+from services.rag_agent import generate_answer
 
 router = APIRouter(tags=["API Endpoints"])
 
@@ -18,10 +20,12 @@ async def ingest_data(request: IngestRequest) -> IngestResponse:
         # Fetch real data using the pubmed_fetcher service
         articles = await fetch_abstracts(topic=request.topic, max_results=request.max_results)
         
-        # TODO: Store 'articles' in ChromaDB (Phase 4)
+        # Store articles in ChromaDB
+        if articles:
+            vector_store.add_articles(articles)
         
         return IngestResponse(
-            message=f"Successfully fetched abstracts for topic: '{request.topic}'. ChromaDB storage pending.",
+            message=f"Successfully fetched and stored abstracts for topic: '{request.topic}'.",
             articles_ingested=len(articles)
         )
     except Exception as e:
@@ -35,11 +39,8 @@ async def chat(request: ChatRequest) -> ChatResponse:
     Retrieves relevant contexts from ChromaDB and generates an answer via Pydantic AI.
     """
     try:
-        # TODO: Integrate with backend/rag_agent.py (ChromaDB + Pydantic AI)
-        # Placeholder logic
-        return ChatResponse(
-            answer=f"This is a placeholder response for: '{request.query}'. True RAG integration pending.",
-            sources=["PMID:12345678 (Placeholder)"]
-        )
+        # Generate the answer using our Pydantic AI agent and vector store context
+        response = await generate_answer(request.query)
+        return response
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Chat generation failed: {str(e)}")

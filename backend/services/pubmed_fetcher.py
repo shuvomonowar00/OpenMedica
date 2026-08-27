@@ -9,7 +9,7 @@ import logging
 from typing import List
 from Bio import Entrez
 from fastapi import HTTPException
-from schemas import PubMedArticle
+from models.schemas import PubMedArticle
 
 # Configure logging
 logger = logging.getLogger(__name__)

@@ -18,11 +18,11 @@ Use this document to track project progress. Update it whenever a task is comple
 - [x] Implement `backend/pubmed_fetcher.py` using Biopython
 - [x] Implement Model Agnostic Factory (`backend/llm_factory.py`)
 
-## Phase 4: Backend - RAG Engine (Pydantic AI) (CURRENT)
-- [ ] Implement vector storage with ChromaDB
-- [ ] Implement `backend/rag_agent.py` using Pydantic AI for strict structured output
+## Phase 4: Backend - RAG Engine (Pydantic AI) (COMPLETED)
+- [x] Implement vector storage with ChromaDB
+- [x] Implement `backend/rag_agent.py` using Pydantic AI for strict structured output
 
-## Phase 5: Frontend - Streamlit UI
+## Phase 5: Frontend - Streamlit UI (CURRENT)
 - [ ] Implement `frontend/app.py` with REST calls to FastAPI backend
 
-**Current Task**: We are on Phase 4 (Backend - RAG Engine). Next step is to implement vector storage with ChromaDB.
+**Current Task**: We have completed Phase 4 (Backend - RAG Engine) including ChromaDB and the Pydantic AI agent. The next step is Phase 5 (Frontend - Streamlit UI), which involves building `frontend/app.py` to make REST calls to our backend.
