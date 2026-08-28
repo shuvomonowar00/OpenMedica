@@ -51,11 +51,38 @@ async def view_database():
     Utility endpoint to peek inside ChromaDB and see what articles are currently stored.
     """
     try:
-        # get() with no arguments fetches the top results (usually 10 or all)
-        data = vector_store.collection.get()
+        # get() fetches ids, metadatas, and documents
+        data = vector_store.collection.get(include=["metadatas", "documents"])
+        ids = data.get("ids", [])
+        metadatas = data.get("metadatas", [])
+        documents = data.get("documents", [])
+        
+        articles = []
+        for i in range(len(ids)):
+            meta = metadatas[i] if metadatas else {}
+            doc = documents[i] if documents else ""
+            articles.append({
+                "id": ids[i],
+                "pmid": meta.get("pmid", ""),
+                "title": meta.get("title", ""),
+                "authors": meta.get("authors", ""),
+                "abstract": doc
+            })
+            
         return {
-            "total_articles": len(data["ids"]) if data["ids"] else 0,
-            "articles": data["metadatas"] if data["metadatas"] else []
+            "total_articles": len(ids),
+            "articles": articles
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to read database: {str(e)}")
+
+@router.delete("/database/{pmid}")
+async def delete_article(pmid: str):
+    """
+    Deletes an article from ChromaDB using its PMID.
+    """
+    try:
+        vector_store.delete_article(pmid)
+        return {"message": f"Successfully deleted article {pmid}"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to delete article: {str(e)}")

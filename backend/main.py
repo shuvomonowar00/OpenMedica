@@ -3,6 +3,14 @@ OpenMedica - Backend Core API
 This module initializes the FastAPI application and includes routers.
 """
 
+import os
+from dotenv import load_dotenv
+
+# Automatically load the .env file from the root directory (../.env)
+# This will silently fail in Docker if the file isn't there, which is perfect!
+env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env")
+load_dotenv(env_path)
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routers.api import router as api_router

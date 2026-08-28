@@ -42,3 +42,11 @@ def test_chat_endpoint():
         assert data["answer"] == "This is a mock answer based on PMIDs."
         assert "12345" in data["sources"]
         mock_generate.assert_called_once_with("Test query")
+
+def test_delete_endpoint():
+    with patch("routers.api.vector_store.delete_article") as mock_delete:
+        response = client.delete("/api/database/12345")
+        
+        assert response.status_code == 200
+        assert "Successfully deleted article 12345" in response.json()["message"]
+        mock_delete.assert_called_once_with("12345")

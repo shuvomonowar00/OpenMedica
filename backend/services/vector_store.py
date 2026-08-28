@@ -135,6 +135,11 @@ class VectorStore:
             
         return articles
 
+    def delete_article(self, pmid: str) -> None:
+        """Deletes an article from the vector store by its PMID."""
+        self.collection.delete(ids=[pmid])
+        logger.info(f"Deleted article with PMID {pmid} from ChromaDB.")
+
 # Singleton instance to be used across the app
 DB_DIR = os.path.join(os.path.dirname(__file__), "..", ".chroma_data")
 vector_store = VectorStore(db_path=DB_DIR)
