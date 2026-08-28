@@ -3,6 +3,15 @@ from unittest.mock import patch
 from models.schemas import PubMedArticle
 from services.vector_store import VectorStore
 
+from chromadb.api.types import Documents, Embeddings, EmbeddingFunction
+
+class DummyEmbeddingFunction(EmbeddingFunction):
+    def __call__(self, input: Documents) -> Embeddings:
+        return [[0.0] * 768 for _ in input]
+        
+    def name(self) -> str:
+        return "dummy_embedder"
+
 @pytest.fixture
 def mock_vector_store(tmp_path):
     # Use a temporary directory for ChromaDB to isolate tests
@@ -10,11 +19,7 @@ def mock_vector_store(tmp_path):
     
     # Mock the embedding function to return deterministic dummy embeddings
     # to avoid needing a real Gemini API key during testing.
-    def dummy_embed(input_docs):
-        # Return a simple vector of zeros for each document
-        return [[0.0] * 768 for _ in input_docs]
-        
-    store.embedding_fn = dummy_embed
+    store.embedding_fn = DummyEmbeddingFunction()
     # Re-initialize collection with the mocked embedding function
     store.collection = store.client.get_or_create_collection(
         name="test_collection",

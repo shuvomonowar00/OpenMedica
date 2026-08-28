@@ -12,5 +12,9 @@ dependencies = [
     "httpx>=0.28.1",
     "pydantic-ai>=2.35.0",
     "pytest>=8.3.4",
+    "pytest-asyncio>=0.24.0",
     "uvicorn>=0.52.4",
 ]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

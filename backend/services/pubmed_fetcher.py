@@ -5,6 +5,7 @@ Follows strict clean coding rules: type hinting, Pydantic schemas, and async IO 
 """
 
 import asyncio
+import os
 import logging
 from typing import List
 from Bio import Entrez
@@ -14,8 +15,11 @@ from models.schemas import PubMedArticle
 # Configure logging
 logger = logging.getLogger(__name__)
 
-# NCBI strictly requires an email address and tool name for API access to avoid rate-limit bans.
-Entrez.email = "openmedica_agent@example.com"
+# Enforce zero-hardcoding for the NCBI email requirement
+_pubmed_email = os.getenv("PUBMED_EMAIL")
+if not _pubmed_email:
+    raise ValueError("PUBMED_EMAIL environment variable is not set. This is required for NCBI API access.")
+Entrez.email = _pubmed_email
 Entrez.tool = "OpenMedica_RAG_Pipeline"
 
 # --- Core Logic ---

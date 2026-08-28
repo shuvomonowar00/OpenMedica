@@ -44,3 +44,18 @@ async def chat(request: ChatRequest) -> ChatResponse:
         return response
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Chat generation failed: {str(e)}")
+
+@router.get("/database")
+async def view_database():
+    """
+    Utility endpoint to peek inside ChromaDB and see what articles are currently stored.
+    """
+    try:
+        # get() with no arguments fetches the top results (usually 10 or all)
+        data = vector_store.collection.get()
+        return {
+            "total_articles": len(data["ids"]) if data["ids"] else 0,
+            "articles": data["metadatas"] if data["metadatas"] else []
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to read database: {str(e)}")

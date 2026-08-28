@@ -18,10 +18,9 @@ Return your answer strictly in the requested JSON structure.
 """
 
 # Initialize the Pydantic AI Agent
-# We use result_type=ChatResponse to enforce strict structured output
 rag_agent = Agent(
     model=get_llm(),
-    result_type=ChatResponse,
+    output_type=ChatResponse,
     system_prompt=SYSTEM_PROMPT,
 )
 
@@ -49,4 +48,4 @@ async def generate_answer(query: str, n_results: int = 5) -> ChatResponse:
     # 3. Run the agent (Pydantic AI handles the async run and parsing)
     result = await rag_agent.run(user_prompt)
     
-    return result.data
+    return result.output

@@ -10,3 +10,4 @@ os.environ["GEMINI_API_KEY"] = "test-key"
 
 os.environ["ACTIVE_EMBEDDING_PROVIDER"] = "gemini"
 os.environ["GEMINI_EMBEDDING_MODEL"] = "test-embed"
+os.environ["PUBMED_EMAIL"] = "test@example.com"

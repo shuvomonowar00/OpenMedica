@@ -7,7 +7,7 @@ Zero-hardcoding: everything is driven strictly by .env configurations.
 import os
 import logging
 from pydantic_ai.models import Model
-from pydantic_ai.models.gemini import GeminiModel
+from pydantic_ai.models.google import GoogleModel
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -29,7 +29,7 @@ def get_llm() -> Model:
         api_key = os.getenv("GEMINI_API_KEY")
         if not model_name or not api_key:
             raise ValueError("Missing GEMINI_LLM_MODEL or GEMINI_API_KEY in .env configuration.")
-        return GeminiModel(model_name=model_name, api_key=api_key)
+        return GoogleModel(model_name=model_name)
         
     elif provider == "openai":
         from pydantic_ai.models.openai import OpenAIModel
