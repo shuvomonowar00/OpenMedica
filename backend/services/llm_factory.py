@@ -1,7 +1,7 @@
 """
 OpenMedica - LLM Factory
 Model Agnostic Factory to instantiate and configure Pydantic AI models.
-Follows strict clean coding rules and ensures the application remains decoupled from specific AI providers.
+Zero-hardcoding: everything is driven strictly by .env configurations.
 """
 
 import os
@@ -15,34 +15,37 @@ logger = logging.getLogger(__name__)
 def get_llm() -> Model:
     """
     Factory function to instantiate and return the configured Pydantic AI model.
-    Reads the 'LLM_PROVIDER' and 'LLM_MODEL_NAME' environment variables.
-    
-    Returns:
-        Model: A fully configured Pydantic AI Model instance.
-        
-    Raises:
-        ValueError: If the required API keys are missing or if the provider is unsupported.
+    Strictly reads from .env without fallbacks.
     """
-    provider = os.getenv("LLM_PROVIDER", "gemini").lower().strip()
-    model_name = os.getenv("LLM_MODEL_NAME", "gemini-1.5-flash").strip()
-    
-    logger.info(f"Initializing LLM Factory with provider: '{provider}', model: '{model_name}'")
+    provider = os.getenv("ACTIVE_LLM_PROVIDER")
+    if not provider:
+        raise ValueError("ACTIVE_LLM_PROVIDER is not set in your .env file.")
+        
+    provider = provider.lower().strip()
+    logger.info(f"Initializing LLM Factory with active provider: '{provider}'")
     
     if provider == "gemini":
-        # Pydantic AI uses GEMINI_API_KEY natively. We check for it to provide a clean error.
-        api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
-        
-        if not api_key:
-            raise ValueError(
-                "Missing API Key for Gemini. Please set 'GEMINI_API_KEY' in your environment variables."
-            )
-            
-        # Return the instantiated Pydantic AI Gemini model
+        model_name = os.getenv("GEMINI_LLM_MODEL")
+        api_key = os.getenv("GEMINI_API_KEY")
+        if not model_name or not api_key:
+            raise ValueError("Missing GEMINI_LLM_MODEL or GEMINI_API_KEY in .env configuration.")
         return GeminiModel(model_name=model_name, api_key=api_key)
         
-    # Future-proofing for other providers like OpenAI, Anthropic, etc.
     elif provider == "openai":
-        raise NotImplementedError("OpenAI provider is not yet implemented. Please use 'gemini'.")
+        from pydantic_ai.models.openai import OpenAIModel
+        model_name = os.getenv("OPENAI_LLM_MODEL")
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not model_name or not api_key:
+            raise ValueError("Missing OPENAI_LLM_MODEL or OPENAI_API_KEY in .env configuration.")
+        return OpenAIModel(model_name=model_name, api_key=api_key)
+        
+    elif provider == "anthropic":
+        from pydantic_ai.models.anthropic import AnthropicModel
+        model_name = os.getenv("ANTHROPIC_LLM_MODEL")
+        api_key = os.getenv("ANTHROPIC_API_KEY")
+        if not model_name or not api_key:
+            raise ValueError("Missing ANTHROPIC_LLM_MODEL or ANTHROPIC_API_KEY in .env configuration.")
+        return AnthropicModel(model_name=model_name, api_key=api_key)
         
     else:
-        raise ValueError(f"Unsupported LLM_PROVIDER: '{provider}'. Please check your .env configuration.")
+        raise ValueError(f"Unsupported ACTIVE_LLM_PROVIDER: '{provider}'. Please check your .env configuration.")
