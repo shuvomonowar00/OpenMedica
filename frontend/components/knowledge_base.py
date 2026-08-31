@@ -94,6 +94,3 @@ def render_knowledge_base():
         selected_index = selected_rows[0]
         selected_article = articles[selected_index]
         showcase_literature_modal(selected_article)
-        
-        # Override the session state to clear the selection when the modal is closed
-        st.session_state["kb_table"] = {"selection": {"rows": [], "columns": []}}
