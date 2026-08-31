@@ -77,3 +77,9 @@ class ChatResponse(BaseModel):
     answer: str
     sources: List[CitationData]
     mesh_terms: List[str] = Field(default_factory=list)
+
+class FeedbackRequest(BaseModel):
+    """Schema for user feedback logging."""
+    query: str = Field(..., description="The user's original query")
+    answer: str = Field(..., description="The AI's generated response")
+    is_positive: bool = Field(..., description="True for thumbs up, False for thumbs down")

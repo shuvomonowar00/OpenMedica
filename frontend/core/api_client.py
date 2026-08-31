@@ -39,6 +39,23 @@ def send_chat(query: str, history: list = None, study_type: str = "All", date_fi
     except requests.exceptions.RequestException as e:
         return {"error": str(e)}
 
+def send_feedback(query: str, answer: str, is_positive: bool) -> Dict[str, Any]:
+    """
+    Sends user feedback to the backend logging endpoint.
+    """
+    url = f"{API_BASE_URL}/feedback"
+    payload = {
+        "query": query,
+        "answer": answer,
+        "is_positive": is_positive
+    }
+    try:
+        response = requests.post(url, json=payload)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        return {"error": str(e)}
+
 def get_database_status() -> Dict[str, Any]:
     """
     Fetches the current status of the ChromaDB database.

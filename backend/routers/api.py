@@ -2,14 +2,46 @@
 OpenMedica - API Router
 Contains the core REST endpoints for the application.
 """
+import json
+import os
+from datetime import datetime
 from fastapi import APIRouter, HTTPException
-from models.schemas import IngestRequest, IngestResponse, ChatRequest, ChatResponse
+from models.schemas import (
+    IngestRequest, 
+    IngestResponse, 
+    ChatRequest, 
+    ChatResponse,
+    FeedbackRequest
+)
 from services.pubmed_fetcher import fetch_abstracts
 from services.vector_store import vector_store
 from services.rag_agent import generate_answer
 from services.query_expansion import expand_query
 
 router = APIRouter(tags=["API Endpoints"])
+
+# Define the log file path securely within the backend directory
+FEEDBACK_LOG_FILE = os.path.join(os.path.dirname(__file__), "..", "feedback_logs.jsonl")
+
+@router.post("/feedback")
+async def submit_feedback(request: FeedbackRequest):
+    """
+    Logs user feedback (thumbs up/down) to a local JSONL file for continuous evaluation.
+    """
+    try:
+        log_entry = {
+            "timestamp": datetime.utcnow().isoformat(),
+            "query": request.query,
+            "is_positive": request.is_positive,
+            "answer": request.answer
+        }
+        
+        with open(FEEDBACK_LOG_FILE, "a", encoding="utf-8") as f:
+            f.write(json.dumps(log_entry) + "\n")
+            
+        return {"message": "Feedback recorded successfully."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to record feedback: {str(e)}")
 
 @router.post("/ingest", response_model=IngestResponse)
 async def ingest_data(request: IngestRequest) -> IngestResponse:

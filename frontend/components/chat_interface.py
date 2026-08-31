@@ -1,6 +1,6 @@
 import streamlit as st
 from core.state_manager import add_message
-from core.api_client import send_chat
+from core.api_client import send_chat, send_feedback
 from utils.export import generate_markdown_report
 
 def render_chat_messages():
@@ -30,8 +30,8 @@ def render_chat_messages():
                         for term in mesh_terms:
                             st.markdown(f"- `{term}`")
                 
-                # Render Export buttons seamlessly inline
-                col1, col2 = st.columns([1, 4])
+                # Render Export buttons and Feedback seamlessly inline
+                col1, col2, col3 = st.columns([1, 1, 3])
                 with col1:
                     st.download_button(
                         label="📥 Download (.md)",
@@ -43,6 +43,15 @@ def render_chat_messages():
                 with col2:
                     with st.popover("📋 View/Copy Note"):
                         st.code(md_report, language="markdown")
+                with col3:
+                    # Render Streamlit native feedback
+                    fb_key = f"fb_{i}"
+                    feedback = st.feedback("thumbs", key=fb_key)
+                    if feedback is not None and not st.session_state.get(f"fb_submitted_{i}"):
+                        is_positive = (feedback == 1)
+                        send_feedback(query, msg["content"], is_positive)
+                        st.session_state[f"fb_submitted_{i}"] = True
+                        st.toast("Feedback recorded. Thank you!")
 
 def handle_chat_input():
     """

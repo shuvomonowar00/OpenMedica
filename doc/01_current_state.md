@@ -45,8 +45,8 @@ Use this document to track project progress. Update it whenever a task is comple
 - [x] **Task 8.4**: Add Export & Share functionality.
 - [x] **Task 8.5**: Expose expanded MeSH terms and search queries in the UI.
 
-## Phase 9: Evaluation & Safety (RUNNING)
+## Phase 9: Evaluation & Safety (COMPLETED)
 - [x] **Task 9.1**: Build Automated RAG Evaluation test set.
-- [ ] **Task 9.2**: Integrate User Feedback Loop in the UI.
+- [x] **Task 9.2**: Integrate User Feedback Loop in the UI.
 
-**Current Task**: Starting Task 9.2 (Phase 9). We will integrate a User Feedback Loop into the UI.
+**Current Task**: All phases completed! OpenMedica MVP is successfully finished! 🎉
