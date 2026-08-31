@@ -4,6 +4,7 @@ from pydantic_ai import Agent, RunContext
 from models.schemas import ChatResponse, PubMedArticle
 from services.llm_factory import get_llm
 from services.vector_store import vector_store
+from services.query_expansion import expand_query
 
 logger = logging.getLogger(__name__)
 
@@ -29,10 +30,14 @@ async def generate_answer(query: str, n_results: int = 5) -> ChatResponse:
     Retrieves context from the vector store and generates a strict, 
     zero-hallucination response using Pydantic AI.
     """
-    # 1. Retrieve context
-    articles = vector_store.query_articles(query, n_results=n_results)
+    # 1. Expand query for better retrieval recall
+    expansion = await expand_query(query)
+    search_query = " ".join([query] + expansion.mesh_terms)
     
-    # 2. Format context
+    # 2. Retrieve context
+    articles = vector_store.query_articles(search_query, n_results=n_results)
+    
+    # 3. Format context
     if not articles:
         context_str = "No relevant PubMed articles found."
     else:

@@ -34,7 +34,7 @@ Use this document to track project progress. Update it whenever a task is comple
 - [x] **Task 6.2**: Implement Evidence Hierarchy Filtering (e.g., RCTs, Meta-Analyses).
 
 ## Phase 7: Clinical Search & RAG Architecture
-- [ ] **Task 7.1**: Implement Medical Query Expansion (MeSH term mapping).
+- [x] **Task 7.1**: Implement Medical Query Expansion (MeSH term mapping).
 - [ ] **Task 7.2**: Implement Hybrid Search (Manual fusion of ChromaDB Vector + Python BM25).
 - [ ] **Task 7.3**: Implement Multi-Agent Verification Pipeline (Synthesizer + Reviewer).
 
@@ -43,9 +43,10 @@ Use this document to track project progress. Update it whenever a task is comple
 - [ ] **Task 8.2**: Build Evidence Grading UI (badges for RCTs/Reviews).
 - [ ] **Task 8.3**: Add Conversational Memory & UI Filters (Date, Study Type).
 - [ ] **Task 8.4**: Add Export & Share functionality.
+- [ ] **Task 8.5**: Expose expanded MeSH terms and search queries in the UI.
 
 ## Phase 9: Evaluation & Safety
 - [ ] **Task 9.1**: Build Automated RAG Evaluation test set.
 - [ ] **Task 9.2**: Integrate User Feedback Loop in the UI.
 
-**Current Task**: Starting Task 7.1 (Phase 7). We will implement Medical Query Expansion (MeSH term mapping) to improve search recall.
+**Current Task**: Starting Task 7.2 (Phase 7). We will implement Hybrid Search (Manual fusion of ChromaDB Vector + Python BM25).

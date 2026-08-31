@@ -31,6 +31,12 @@ class IngestResponse(BaseModel):
     message: str
     articles_ingested: int
 
+class QueryExpansionSchema(BaseModel):
+    """Schema for expanded medical queries with MeSH terms."""
+    original_query: str = Field(..., description="The original user query")
+    mesh_terms: List[str] = Field(default_factory=list, description="List of official MeSH terms")
+    expanded_search_queries: List[str] = Field(default_factory=list, description="List of boolean search queries")
+
 class ChatRequest(BaseModel):
     """Schema for user chat queries."""
     query: str = Field(..., description="The user's medical question")

@@ -7,6 +7,7 @@ from models.schemas import IngestRequest, IngestResponse, ChatRequest, ChatRespo
 from services.pubmed_fetcher import fetch_abstracts
 from services.vector_store import vector_store
 from services.rag_agent import generate_answer
+from services.query_expansion import expand_query
 
 router = APIRouter(tags=["API Endpoints"])
 
@@ -17,9 +18,14 @@ async def ingest_data(request: IngestRequest) -> IngestResponse:
     Fetches abstracts from PubMed based on the topic and stores them in ChromaDB.
     """
     try:
-        # Fetch real data using the pubmed_fetcher service
+        # 1. Expand the query for better PubMed search recall
+        expansion = await expand_query(request.topic)
+        # Use the first boolean expanded query if available, fallback to original topic
+        search_topic = expansion.expanded_search_queries[0] if expansion.expanded_search_queries else request.topic
+        
+        # 2. Fetch real data using the pubmed_fetcher service
         articles = await fetch_abstracts(
-            topic=request.topic, 
+            topic=search_topic, 
             max_results=request.max_results,
             high_evidence_only=request.high_evidence_only
         )
