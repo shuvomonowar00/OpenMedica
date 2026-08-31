@@ -58,6 +58,7 @@ class AgentChatResponse(BaseModel):
     outcome: str = Field(..., description="Description of the clinical outcome")
     answer: str = Field(..., description="The synthesized final answer based on the PICO context")
     sources: list[str] = Field(default_factory=list, description="List of PMIDs used as sources")
+    mesh_terms: List[str] = Field(default_factory=list, description="List of MeSH terms used for the search")
 
 class CitationData(BaseModel):
     """Rich metadata for a cited source to render UI badges."""
@@ -75,3 +76,4 @@ class ChatResponse(BaseModel):
     outcome: str
     answer: str
     sources: List[CitationData]
+    mesh_terms: List[str] = Field(default_factory=list)

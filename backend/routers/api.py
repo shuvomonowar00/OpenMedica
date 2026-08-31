@@ -70,7 +70,8 @@ async def chat(request: ChatRequest) -> ChatResponse:
             comparison=agent_response.comparison,
             outcome=agent_response.outcome,
             answer=agent_response.answer,
-            sources=citation_data
+            sources=citation_data,
+            mesh_terms=agent_response.mesh_terms
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Chat generation failed: {str(e)}")

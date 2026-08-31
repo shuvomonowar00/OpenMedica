@@ -116,4 +116,7 @@ async def generate_answer(query: str, history: List[dict] = None, filters: dict 
         # Fallback to prevent returning dangerous hallucinations
         draft.answer = "⚠️ [WARNING: Our AI reviewer flagged potential inaccuracies in this draft based on the literature. Proceed with caution.]\n\n" + draft.answer
         
+    # Attach transparency data
+    draft.mesh_terms = expansion.mesh_terms
+        
     return draft

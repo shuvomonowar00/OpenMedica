@@ -18,6 +18,10 @@ def generate_markdown_report(query: str, raw_data: Dict[str, Any]) -> str:
     md = f"# OpenMedica Clinical Note\n\n"
     md += f"**Clinical Query:** {query}\n\n"
     
+    mesh_terms = raw_data.get("mesh_terms", [])
+    if mesh_terms:
+        md += f"**MeSH Terms Applied:** {', '.join(mesh_terms)}\n\n"
+    
     md += f"## Clinical Context (PICO)\n"
     md += f"- **Population:** {population}\n"
     md += f"- **Intervention:** {intervention}\n"

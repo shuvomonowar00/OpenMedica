@@ -21,6 +21,15 @@ def render_chat_messages():
                     
                 md_report = generate_markdown_report(query, msg["raw_data"])
                 
+                # Render MeSH Search Details for transparency
+                mesh_terms = msg["raw_data"].get("mesh_terms", [])
+                if mesh_terms:
+                    with st.expander("🔍 Search Details"):
+                        st.markdown("**Original Query:** " + query)
+                        st.markdown("**MeSH Terms Applied:**")
+                        for term in mesh_terms:
+                            st.markdown(f"- `{term}`")
+                
                 # Render Export buttons seamlessly inline
                 col1, col2 = st.columns([1, 4])
                 with col1:
