@@ -38,7 +38,7 @@ def render_citation_panel():
         card_html = f"""
         <div class="citation-card">
             <div style="margin-bottom: 8px;">{badges_html}</div>
-            <div class="citation-title">{title}</div>
+            <div class="citation-title"><a href="https://pubmed.ncbi.nlm.nih.gov/{pmid}/" target="_blank" style="text-decoration: none; color: inherit;">{title}</a></div>
             <div class="citation-meta"><strong>PMID:</strong> {pmid} | <strong>Year:</strong> {year_str}</div>
             <div class="citation-meta"><strong>Authors:</strong> {authors}</div>
         </div>

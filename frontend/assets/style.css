@@ -34,6 +34,10 @@ footer {visibility: hidden;}
     color: #111827;
     margin-bottom: 4px;
 }
+.citation-title a:hover {
+    color: #2563eb !important;
+    text-decoration: underline !important;
+}
 
 .citation-meta {
     font-size: 0.8rem;

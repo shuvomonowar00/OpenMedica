@@ -28,6 +28,11 @@ def showcase_literature_modal(article: dict):
     
     # Action Bar
     col1, col2 = st.columns([4, 1])
+    with col1:
+        pmid = article.get('pmid')
+        if pmid and pmid != "N/A":
+            st.link_button("🔗 Read Full Article on PubMed", f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/")
+            
     with col2:
         if st.button("🗑️ Delete Article", type="primary", use_container_width=True):
             with st.spinner("Deleting..."):
