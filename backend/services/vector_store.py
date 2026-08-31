@@ -4,6 +4,7 @@ import chromadb
 from chromadb.api.types import Documents, EmbeddingFunction, Embeddings
 from google import genai
 from typing import List
+from rank_bm25 import BM25Okapi
 
 from models.schemas import PubMedArticle
 
@@ -79,6 +80,35 @@ class VectorStore:
             embedding_function=self.embedding_fn
         )
         logger.info(f"Initialized ChromaDB at {db_path} with collection {collection_name}")
+        
+        # Initialize in-memory BM25 index
+        self.bm25_corpus = []
+        self.bm25_metadatas = []
+        self.bm25_ids = []
+        self.bm25 = None
+        self._initialize_bm25()
+
+    def _initialize_bm25(self):
+        """Reads all documents from ChromaDB and initializes the BM25 index."""
+        try:
+            data = self.collection.get()
+            docs = data.get("documents", [])
+            metas = data.get("metadatas", [])
+            ids = data.get("ids", [])
+            
+            if docs:
+                self.bm25_corpus = docs
+                self.bm25_metadatas = metas
+                self.bm25_ids = ids
+                
+                # Tokenize for BM25 (simple whitespace tokenization)
+                tokenized_corpus = [doc.lower().split() for doc in self.bm25_corpus]
+                self.bm25 = BM25Okapi(tokenized_corpus)
+                logger.info(f"Initialized BM25 index with {len(docs)} documents.")
+            else:
+                self.bm25 = None
+        except Exception as e:
+            logger.warning(f"Failed to initialize BM25: {e}")
 
     def add_articles(self, articles: List[PubMedArticle]) -> None:
         """Add PubMed articles to the vector store (chunked by section)."""
@@ -117,47 +147,87 @@ class VectorStore:
                 ids=ids
             )
             logger.info(f"Added {len(documents)} chunks from {len(articles)} articles to ChromaDB.")
+            
+            # Update BM25 incrementally (re-initialize to keep it simple and robust)
+            self._initialize_bm25()
 
     def query_articles(self, query: str, n_results: int = 5) -> List[PubMedArticle]:
-        """Query the vector store for relevant PubMed article chunks."""
+        """Hybrid Query: Fuses ChromaDB semantic search with BM25 keyword search using RRF."""
         if self.collection.count() == 0:
             return []
             
-        actual_n = min(n_results, self.collection.count())
+        # Fetch more candidates for RRF ranking
+        actual_n = min(n_results * 2, self.collection.count())
             
-        results = self.collection.query(
+        # 1. ChromaDB Vector Search
+        chroma_results = self.collection.query(
             query_texts=[query],
             n_results=actual_n
         )
+        chroma_ids = chroma_results.get("ids", [[]])[0]
         
+        # 2. BM25 Keyword Search
+        bm25_ids_ranked = []
+        if self.bm25:
+            tokenized_query = query.lower().split()
+            doc_scores = self.bm25.get_scores(tokenized_query)
+            
+            # Get top actual_n indices based on BM25 scores
+            # Use sorted to rank indices by score descending
+            top_n_indices = sorted(range(len(doc_scores)), key=lambda i: doc_scores[i], reverse=True)[:actual_n]
+            bm25_ids_ranked = [self.bm25_ids[i] for i in top_n_indices if doc_scores[i] > 0]
+            
+        # 3. Reciprocal Rank Fusion (RRF)
+        rrf_scores = {}
+        k = 60 # RRF constant
+        
+        for rank, cid in enumerate(chroma_ids):
+            rrf_scores[cid] = rrf_scores.get(cid, 0.0) + 1.0 / (k + rank + 1)
+            
+        for rank, cid in enumerate(bm25_ids_ranked):
+            rrf_scores[cid] = rrf_scores.get(cid, 0.0) + 1.0 / (k + rank + 1)
+            
+        # Sort by RRF score descending
+        sorted_cids = sorted(rrf_scores.keys(), key=lambda x: rrf_scores[x], reverse=True)
+        top_cids = sorted_cids[:n_results]
+        
+        # 4. Construct final PubMedArticle objects
         articles = []
-        if not results["metadatas"] or not results["metadatas"][0]:
-            return articles
-            
-        for idx, metadata in enumerate(results["metadatas"][0]):
-            doc_text = results["documents"][0][idx] if results["documents"] else ""
-            
-            # Reconstruct as PubMedArticle. 
-            # We store the chunk text in the 'abstract' field so the RAG agent can read it,
-            # and prefix it with the section title.
-            section_title = metadata.get("section_title", "Unknown Section")
-            chunk_content = f"[{section_title}] {doc_text}"
-            
-            articles.append(PubMedArticle(
-                pmid=str(metadata["pmid"]),
-                pmcid=str(metadata.get("pmcid", "")),
-                title=str(metadata["title"]),
-                abstract=chunk_content,
-                authors=str(metadata["authors"]).split(", ") if metadata.get("authors") else [],
-                publication_types=str(metadata.get("publication_types", "")).split(", ") if metadata.get("publication_types") else []
-            ))
-            
+        for cid in top_cids:
+            try:
+                idx = self.bm25_ids.index(cid)
+                metadata = self.bm25_metadatas[idx]
+                doc_text = self.bm25_corpus[idx]
+                
+                section_title = metadata.get("section_title", "Unknown Section")
+                chunk_content = f"[{section_title}] {doc_text}"
+                
+                articles.append(PubMedArticle(
+                    pmid=str(metadata["pmid"]),
+                    pmcid=str(metadata.get("pmcid", "")),
+                    title=str(metadata["title"]),
+                    abstract=chunk_content,
+                    authors=str(metadata["authors"]).split(", ") if metadata.get("authors") else [],
+                    publication_types=str(metadata.get("publication_types", "")).split(", ") if metadata.get("publication_types") else []
+                ))
+            except ValueError:
+                # Fallback if somehow CID is not in our BM25 tracker
+                continue
+                
         return articles
 
     def delete_article(self, pmid: str) -> None:
-        """Deletes an article from the vector store by its PMID."""
-        self.collection.delete(ids=[pmid])
-        logger.info(f"Deleted article with PMID {pmid} from ChromaDB.")
+        """Deletes an article from the vector store by its PMID and updates BM25."""
+        # Note: Delete requires knowing exactly which ids to delete.
+        # The chunks are named pmid_sec_0, pmid_sec_1, etc.
+        # We need to find all ids that start with pmid
+        ids_to_delete = [cid for cid in self.bm25_ids if cid.startswith(f"{pmid}_sec_")]
+        if ids_to_delete:
+            self.collection.delete(ids=ids_to_delete)
+            logger.info(f"Deleted article with PMID {pmid} from ChromaDB.")
+            self._initialize_bm25()
+        else:
+            logger.info(f"No chunks found for PMID {pmid} to delete.")
 
 # Singleton instance to be used across the app
 DB_DIR = os.path.join(os.path.dirname(__file__), "..", ".chroma_data")

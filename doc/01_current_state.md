@@ -35,7 +35,7 @@ Use this document to track project progress. Update it whenever a task is comple
 
 ## Phase 7: Clinical Search & RAG Architecture
 - [x] **Task 7.1**: Implement Medical Query Expansion (MeSH term mapping).
-- [ ] **Task 7.2**: Implement Hybrid Search (Manual fusion of ChromaDB Vector + Python BM25).
+- [x] **Task 7.2**: Implement Hybrid Search (Manual fusion of ChromaDB Vector + Python BM25).
 - [ ] **Task 7.3**: Implement Multi-Agent Verification Pipeline (Synthesizer + Reviewer).
 
 ## Phase 8: OpenEvidence-Style UI/UX
@@ -49,4 +49,4 @@ Use this document to track project progress. Update it whenever a task is comple
 - [ ] **Task 9.1**: Build Automated RAG Evaluation test set.
 - [ ] **Task 9.2**: Integrate User Feedback Loop in the UI.
 
-**Current Task**: Starting Task 7.2 (Phase 7). We will implement Hybrid Search (Manual fusion of ChromaDB Vector + Python BM25).
+**Current Task**: Starting Task 7.3 (Phase 7). We will implement the Multi-Agent Verification Pipeline (Synthesizer + Reviewer).
