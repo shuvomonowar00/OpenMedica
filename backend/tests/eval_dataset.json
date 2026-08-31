@@ -1,0 +1,18 @@
+[
+    {
+        "id": "q1",
+        "query": "Does aspirin reduce the risk of myocardial infarction?"
+    },
+    {
+        "id": "q2",
+        "query": "What is the recommended first-line treatment for acute asthma exacerbation?"
+    },
+    {
+        "id": "q3",
+        "query": "Are antibiotics effective for treating acute bronchitis in otherwise healthy adults?"
+    },
+    {
+        "id": "q4",
+        "query": "What are the common side effects of statins?"
+    }
+]

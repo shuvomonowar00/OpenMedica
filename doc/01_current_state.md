@@ -46,7 +46,7 @@ Use this document to track project progress. Update it whenever a task is comple
 - [x] **Task 8.5**: Expose expanded MeSH terms and search queries in the UI.
 
 ## Phase 9: Evaluation & Safety (RUNNING)
-- [ ] **Task 9.1**: Build Automated RAG Evaluation test set.
+- [x] **Task 9.1**: Build Automated RAG Evaluation test set.
 - [ ] **Task 9.2**: Integrate User Feedback Loop in the UI.
 
-**Current Task**: Starting Task 9.1 (Phase 9). We will build an Automated RAG Evaluation test set.
+**Current Task**: Starting Task 9.2 (Phase 9). We will integrate a User Feedback Loop into the UI.
