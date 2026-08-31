@@ -111,3 +111,8 @@ footer {visibility: hidden;}
     color: #475569;
     border: 1px solid #e2e8f0;
 }
+
+/* Hide Streamlit 'Press Enter to apply' hint in inputs */
+div[data-testid="InputInstructions"] {
+    display: none !important;
+}
