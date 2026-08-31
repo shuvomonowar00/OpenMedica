@@ -37,6 +37,11 @@ class QueryExpansionSchema(BaseModel):
     mesh_terms: List[str] = Field(default_factory=list, description="List of official MeSH terms")
     expanded_search_queries: List[str] = Field(default_factory=list, description="List of boolean search queries")
 
+class ReviewSchema(BaseModel):
+    """Schema for the strict multi-agent reviewer."""
+    is_grounded: bool = Field(..., description="True if the draft is 100% grounded in the context, False if there are hallucinations or unsupported claims.")
+    feedback: str = Field(..., description="Detailed feedback on what claims are unsupported, or 'Looks good' if grounded.")
+
 class ChatRequest(BaseModel):
     """Schema for user chat queries."""
     query: str = Field(..., description="The user's medical question")
