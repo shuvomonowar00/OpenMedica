@@ -8,7 +8,7 @@ def render_chat_messages():
     """
     for msg in st.session_state.chat_history:
         with st.chat_message(msg["role"]):
-            st.markdown(msg["content"])
+            st.markdown(msg["content"], unsafe_allow_html=True)
 
 def handle_chat_input():
     """
@@ -25,21 +25,57 @@ def handle_chat_input():
             
         # 3. Call backend and render AI response
         with st.chat_message("assistant"):
-            with st.spinner("Analyzing PubMed literature..."):
+            with st.status("Analyzing clinical query...", expanded=True) as status:
+                st.write("Expanding MeSH terms...")
+                st.write("Retrieving evidence from ChromaDB...")
+                st.write("Multi-agent synthesis and review...")
                 res = send_chat(prompt)
+                status.update(label="Analysis complete!", state="complete", expanded=False)
                 
-                if "error" in res:
-                    error_msg = f"Sorry, I encountered an error: {res['error']}"
-                    st.error(error_msg)
-                    add_message("assistant", error_msg)
-                else:
-                    # Parse Pydantic AI Response (our backend returns structured data)
-                    # The response matches the ChatResponse schema in backend
-                    answer = res.get("answer", "No answer provided.")
-                    citations = res.get("citations", [])
-                    
-                    st.markdown(answer)
-                    add_message("assistant", answer, citations)
-                    
-                    # Force a rerun to update the citation panel if needed
-                    st.rerun()
+            if "error" in res:
+                error_msg = f"Sorry, I encountered an error: {res['error']}"
+                st.error(error_msg)
+                add_message("assistant", error_msg)
+            else:
+                # Parse Pydantic AI Response (our backend returns structured data)
+                answer = res.get("answer", "No answer provided.")
+                sources = res.get("sources", [])
+                
+                # Render PICO formatted elements if available
+                pico_keys = ["population", "intervention", "comparison", "outcome"]
+                full_content = ""
+                
+                if all(k in res for k in pico_keys):
+                    pico_html = f'''
+                    <div class="pico-container">
+                        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                            <div class="pico-card" style="flex: 1;">
+                                <div class="pico-header">Population</div>
+                                <div class="pico-content">{res["population"]}</div>
+                            </div>
+                            <div class="pico-card" style="flex: 1;">
+                                <div class="pico-header">Intervention</div>
+                                <div class="pico-content">{res["intervention"]}</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <div class="pico-card" style="flex: 1;">
+                                <div class="pico-header">Comparison</div>
+                                <div class="pico-content">{res["comparison"]}</div>
+                            </div>
+                            <div class="pico-card" style="flex: 1;">
+                                <div class="pico-header">Outcome</div>
+                                <div class="pico-content">{res["outcome"]}</div>
+                            </div>
+                        </div>
+                    </div>
+                    '''
+                    full_content += pico_html
+                
+                full_content += answer
+                
+                st.markdown(full_content, unsafe_allow_html=True)
+                add_message("assistant", full_content, sources)
+                
+                # Force a rerun to update the citation panel if needed
+                st.rerun()

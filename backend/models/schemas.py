@@ -48,5 +48,9 @@ class ChatRequest(BaseModel):
 
 class ChatResponse(BaseModel):
     """Schema for RAG chat responses, ensuring strict structure."""
-    answer: str
+    population: str = Field(..., description="Description of the patient population or problem")
+    intervention: str = Field(..., description="Description of the intervention or exposure")
+    comparison: str = Field(default="N/A", description="Description of the comparison or control. Use 'N/A' if none.")
+    outcome: str = Field(..., description="Description of the clinical outcome")
+    answer: str = Field(..., description="The synthesized final answer based on the PICO context")
     sources: list[str] = Field(default_factory=list, description="List of PMIDs used as sources")
