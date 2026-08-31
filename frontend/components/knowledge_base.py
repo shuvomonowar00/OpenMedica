@@ -13,17 +13,47 @@ def showcase_literature_modal(article: dict):
     st.markdown(f"**Authors:** {article.get('authors', 'N/A')} | **PMID:** {article.get('pmid', 'N/A')}")
     st.markdown("---")
     
-    # Format the abstract nicely
-    abstract = article.get("abstract", "")
-    if abstract.startswith("Title:"):
-        # The backend combines Title and Abstract in the document text, let's just display it nicely.
-        # It's "Title: ...\n\nAbstract: ..."
-        parts = abstract.split("\n\nAbstract: ")
-        if len(parts) > 1:
-            abstract = parts[1]
+    import re
+    # Format the text purely in Markdown for perfect Streamlit rendering
+    raw_text = article.get("abstract", "")
+    section_name = "Content"
+    clean_text = raw_text
+
+    # 1. Strip out the backend metadata (Title & Section injected by ChromaDB)
+    match = re.search(r"^Title:[^\n]+\nSection:\s*([^\n]+)\n\n(.*)", raw_text, re.DOTALL)
+    if match:
+        section_name = match.group(1).strip()
+        clean_text = match.group(2).strip()
+
+    # 2. Convert clinical headers (BACKGROUND:, etc.) into standard Markdown bolding
+    # This prevents HTML tag breakage and leverages Streamlit's native typography
+    clean_text = re.sub(r"\b([A-Z][A-Z\s]{3,25}):\s", r"\n\n**\1:** ", clean_text)
     
-    st.markdown("#### Abstract")
-    st.markdown(f"<div class='abstract-text'>{abstract}</div>", unsafe_allow_html=True)
+    # 3. Normalize all paragraph spacing (ensure max 2 newlines)
+    clean_text = re.sub(r"\n{3,}", "\n\n", clean_text).strip()
+
+    # 4. Smart Heuristic for Human Readability: 
+    # Visually segregate floating captions, glossaries, and short fragments into blockquotes
+    paragraphs = clean_text.split('\n\n')
+    formatted_paragraphs = []
+    for p in paragraphs:
+        p_strip = p.strip()
+        if not p_strip:
+            continue
+        # If the paragraph is short (< 130 chars) and isn't already a formatted clinical header
+        if len(p_strip) < 130 and "**" not in p_strip:
+            formatted_paragraphs.append(f"> *{p_strip}*")
+        else:
+            formatted_paragraphs.append(p_strip)
+            
+    clean_text = "\n\n".join(formatted_paragraphs)
+
+    st.markdown(f"#### {section_name}")
+    
+    # Use Streamlit's native scrollable card container for a flawless layout
+    with st.container(height=400, border=True):
+        st.markdown(clean_text)
+        
     st.markdown("---")
     
     # Action Bar
