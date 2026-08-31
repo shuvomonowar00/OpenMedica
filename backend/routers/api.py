@@ -89,7 +89,8 @@ async def chat(request: ChatRequest) -> ChatResponse:
         agent_response = await generate_answer(
             query=request.query, 
             history=request.history,
-            filters=filters
+            filters=filters,
+            n_results=request.n_results
         )
         
         # Enrich the PMIDs with full citation data for the UI

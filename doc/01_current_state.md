@@ -54,4 +54,9 @@ Use this document to track project progress. Update it whenever a task is comple
 - [x] **Task 10.2**: Implement Advanced PubMed Query Builder (UI toggles for full-text, RCTs, date limits).
 - [x] **Task 10.3**: Build Ingestion Command Center Layout.
 
-**Current Task**: All phases completed! The Advanced Ingestion UI is active. 🎉
+## Phase 11: Sidebar Cockpit & AI Tuning UI (COMPLETED)
+- [x] **Task 11.1**: Redesign Sidebar visual hierarchy (System Health Dashboard).
+- [x] **Task 11.2**: Implement 'Retrieval Depth' RAG tuning slider in frontend.
+- [x] **Task 11.3**: Update Backend `ChatRequest` schema and API to accept `n_results` parameter.
+
+**Current Task**: All phases completed! The Sidebar Cockpit is active. 🎉

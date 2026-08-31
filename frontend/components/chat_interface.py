@@ -73,9 +73,10 @@ def handle_chat_input():
                 st.write("Retrieving evidence from ChromaDB...")
                 st.write("Multi-agent synthesis and review...")
                 
-                # Fetch filters from session state
+                # Fetch filters and RAG settings from session state (Cockpit Sidebar)
                 study_type = st.session_state.get("filter_study_type", "All")
                 date_filter = st.session_state.get("filter_date", "All Time")
+                n_results = st.session_state.get("retrieval_depth", 5)
                 
                 # We need to exclude the newly added user prompt from the history we send
                 # because `add_message` just added it. So we slice [:-1]
@@ -85,7 +86,8 @@ def handle_chat_input():
                     query=prompt, 
                     history=history, 
                     study_type=study_type, 
-                    date_filter=date_filter
+                    date_filter=date_filter,
+                    n_results=n_results
                 )
                 
                 status.update(label="Analysis complete!", state="complete", expanded=False)

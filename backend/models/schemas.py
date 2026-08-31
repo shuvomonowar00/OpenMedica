@@ -49,6 +49,7 @@ class ChatRequest(BaseModel):
     history: List[dict] = Field(default_factory=list, description="Conversational history (role and content)")
     study_type: str = Field(default="All", description="Filter by study type (All, RCTs Only, Meta-Analyses Only)")
     date_filter: str = Field(default="All Time", description="Filter by date (All Time, Last Year, Last 5 Years)")
+    n_results: int = Field(default=5, description="Number of articles to retrieve from ChromaDB")
 
 class AgentChatResponse(BaseModel):
     """Schema for Pydantic AI RAG chat responses."""

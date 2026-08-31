@@ -18,7 +18,7 @@ def ingest_data(topic: str, max_results: int = 5) -> Dict[str, Any]:
     except requests.exceptions.RequestException as e:
         return {"error": str(e)}
 
-def send_chat(query: str, history: list = None, study_type: str = "All", date_filter: str = "All Time") -> Dict[str, Any]:
+def send_chat(query: str, history: list = None, study_type: str = "All", date_filter: str = "All Time", n_results: int = 5) -> Dict[str, Any]:
     """
     Sends a chat query to the backend RAG engine.
     """
@@ -30,7 +30,8 @@ def send_chat(query: str, history: list = None, study_type: str = "All", date_fi
         "query": query,
         "history": history,
         "study_type": study_type,
-        "date_filter": date_filter
+        "date_filter": date_filter,
+        "n_results": n_results
     }
     try:
         response = requests.post(url, json=payload)

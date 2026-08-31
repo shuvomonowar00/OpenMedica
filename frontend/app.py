@@ -31,16 +31,17 @@ from components.ingestion import render_ingestion_page
 # --- Initialize State ---
 initialize_state()
 
-# --- Main Layout ---
-render_sidebar()
+# Show success toast if chat was just cleared
+if st.session_state.get("show_clear_toast", False):
+    st.toast("Clinical context memory wiped successfully!", icon="🧹")
+    st.session_state.show_clear_toast = False
 
-# OpenEvidence style layout with Tabs for extra features
-tab_ingest, tab_chat, tab_kb = st.tabs(["📥 Data Ingestion", "💬 Chat Interface", "📚 Knowledge Base Explorer"])
+selected_page = render_sidebar()
 
-with tab_ingest:
+if selected_page == "📥 Data Ingestion":
     render_ingestion_page()
 
-with tab_chat:
+elif selected_page == "💬 Chat Interface":
     col_chat, col_sources = st.columns([2, 1], gap="large")
     
     with col_chat:
@@ -56,5 +57,5 @@ with tab_chat:
     with col_sources:
         render_citation_panel()
 
-with tab_kb:
+elif selected_page == "📚 Knowledge Base Explorer":
     render_knowledge_base()
