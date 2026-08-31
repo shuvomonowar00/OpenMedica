@@ -136,7 +136,8 @@ class VectorStore:
                     "title": article.title,
                     "authors": ", ".join(article.authors),
                     "section_title": section.section_title,
-                    "publication_types": ", ".join(article.publication_types)
+                    "publication_types": ", ".join(article.publication_types),
+                    "pub_year": article.pub_year
                 }
                 metadatas.append(metadata)
                 
@@ -154,13 +155,13 @@ class VectorStore:
             # Update BM25 incrementally (re-initialize to keep it simple and robust)
             self._initialize_bm25()
 
-    def query_articles(self, query: str, n_results: int = 5) -> List[PubMedArticle]:
+    def query_articles(self, query: str, filters: dict = None, n_results: int = 5) -> List[PubMedArticle]:
         """Hybrid Query: Fuses ChromaDB semantic search with BM25 keyword search using RRF."""
         if self.collection.count() == 0:
             return []
             
         # Fetch more candidates for RRF ranking
-        actual_n = min(n_results * 2, self.collection.count())
+        actual_n = min(n_results * 4, self.collection.count())
             
         # 1. ChromaDB Vector Search
         chroma_results = self.collection.query(
@@ -192,14 +193,43 @@ class VectorStore:
             
         # Sort by RRF score descending
         sorted_cids = sorted(rrf_scores.keys(), key=lambda x: rrf_scores[x], reverse=True)
-        top_cids = sorted_cids[:n_results]
         
-        # 4. Construct final PubMedArticle objects
+        # 4. Construct final PubMedArticle objects with Filtering
+        import datetime
+        current_year = datetime.datetime.now().year
+        
+        study_filter = filters.get("study_type", "All") if filters else "All"
+        date_filter = filters.get("date_filter", "All Time") if filters else "All Time"
+        
+        min_year = 0
+        if date_filter == "Last Year":
+            min_year = current_year - 1
+        elif date_filter == "Last 5 Years":
+            min_year = current_year - 5
+            
         articles = []
-        for cid in top_cids:
+        for cid in sorted_cids:
+            if len(articles) >= n_results:
+                break
+                
             try:
                 idx = self.bm25_ids.index(cid)
                 metadata = self.bm25_metadatas[idx]
+                
+                # --- Apply UI Filters ---
+                if study_filter != "All":
+                    ptypes = str(metadata.get("publication_types", "")).lower()
+                    if study_filter == "RCTs Only" and "randomized controlled trial" not in ptypes:
+                        continue
+                    if study_filter == "Meta-Analyses Only" and "meta-analysis" not in ptypes and "systematic review" not in ptypes:
+                        continue
+                        
+                pub_year = metadata.get("pub_year", 0)
+                # If pub_year is 0 (unknown), user requested we still include it.
+                if min_year > 0 and pub_year != 0 and pub_year < min_year:
+                    continue
+                # ------------------------
+                
                 doc_text = self.bm25_corpus[idx]
                 
                 section_title = metadata.get("section_title", "Unknown Section")
@@ -211,7 +241,8 @@ class VectorStore:
                     title=str(metadata["title"]),
                     abstract=chunk_content,
                     authors=str(metadata["authors"]).split(", ") if metadata.get("authors") else [],
-                    publication_types=str(metadata.get("publication_types", "")).split(", ") if metadata.get("publication_types") else []
+                    publication_types=str(metadata.get("publication_types", "")).split(", ") if metadata.get("publication_types") else [],
+                    pub_year=pub_year
                 ))
             except ValueError:
                 # Fallback if somehow CID is not in our BM25 tracker
@@ -244,7 +275,8 @@ class VectorStore:
                     "pmid": pmid,
                     "title": meta.get("title", "Unknown Title"),
                     "authors": meta.get("authors", "Unknown Authors"),
-                    "publication_types": pub_types
+                    "publication_types": pub_types,
+                    "pub_year": meta.get("pub_year", 0)
                 }
         
         # Preserve input order

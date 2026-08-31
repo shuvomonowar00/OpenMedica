@@ -49,8 +49,16 @@ async def chat(request: ChatRequest) -> ChatResponse:
     Retrieves relevant contexts from ChromaDB and generates an answer via Pydantic AI.
     """
     try:
+        filters = {
+            "study_type": request.study_type,
+            "date_filter": request.date_filter
+        }
         # Generate the answer using our Pydantic AI agent and vector store context
-        agent_response = await generate_answer(request.query)
+        agent_response = await generate_answer(
+            query=request.query, 
+            history=request.history,
+            filters=filters
+        )
         
         # Enrich the PMIDs with full citation data for the UI
         pmids = agent_response.sources

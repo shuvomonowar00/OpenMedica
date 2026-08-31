@@ -19,6 +19,7 @@ class PubMedArticle(BaseModel):
     authors: List[str] = Field(default_factory=list, description="List of author names")
     sections: List[ArticleSection] = Field(default_factory=list, description="Intelligently chunked sections of the full text")
     publication_types: List[str] = Field(default_factory=list, description="List of study types (e.g., Meta-Analysis, RCT)")
+    pub_year: int = Field(default=0, description="Publication year (0 if unknown)")
 
 class IngestRequest(BaseModel):
     """Schema for data ingestion requests from PubMed."""
@@ -45,6 +46,9 @@ class ReviewSchema(BaseModel):
 class ChatRequest(BaseModel):
     """Schema for user chat queries."""
     query: str = Field(..., description="The user's medical question")
+    history: List[dict] = Field(default_factory=list, description="Conversational history (role and content)")
+    study_type: str = Field(default="All", description="Filter by study type (All, RCTs Only, Meta-Analyses Only)")
+    date_filter: str = Field(default="All Time", description="Filter by date (All Time, Last Year, Last 5 Years)")
 
 class AgentChatResponse(BaseModel):
     """Schema for Pydantic AI RAG chat responses."""
@@ -61,6 +65,7 @@ class CitationData(BaseModel):
     title: str
     authors: str
     publication_types: List[str] = Field(default_factory=list)
+    pub_year: int = Field(default=0)
 
 class ChatResponse(BaseModel):
     """Schema for the REST API response returned to the frontend."""

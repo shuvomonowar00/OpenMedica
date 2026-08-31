@@ -41,7 +41,7 @@ Use this document to track project progress. Update it whenever a task is comple
 ## Phase 8: OpenEvidence-Style UI/UX (RUNNING)
 - [x] **Task 8.1**: Enforce PICO-Formatted Outputs from the LLM.
 - [x] **Task 8.2**: Build Evidence Grading UI (badges for RCTs/Reviews).
-- [ ] **Task 8.3**: Add Conversational Memory & UI Filters (Date, Study Type).
+- [x] **Task 8.3**: Add Conversational Memory & UI Filters (Date, Study Type).
 - [ ] **Task 8.4**: Add Export & Share functionality.
 - [ ] **Task 8.5**: Expose expanded MeSH terms and search queries in the UI.
 
@@ -49,4 +49,4 @@ Use this document to track project progress. Update it whenever a task is comple
 - [ ] **Task 9.1**: Build Automated RAG Evaluation test set.
 - [ ] **Task 9.2**: Integrate User Feedback Loop in the UI.
 
-**Current Task**: Starting Task 8.3 (Phase 8). We will add Conversational Memory & UI Filters (Date, Study Type).
+**Current Task**: Starting Task 8.4 (Phase 8). We will add Export & Share functionality.

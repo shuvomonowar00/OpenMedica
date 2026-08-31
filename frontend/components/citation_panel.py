@@ -18,6 +18,8 @@ def render_citation_panel():
         title = cit.get("title", "Unknown Title")
         authors = cit.get("authors", "Unknown Authors")
         pub_types = cit.get("publication_types", [])
+        pub_year = cit.get("pub_year", 0)
+        year_str = str(pub_year) if pub_year > 0 else "Unknown Year"
         
         # Build badges HTML
         badges_html = ""
@@ -37,7 +39,7 @@ def render_citation_panel():
         <div class="citation-card">
             <div style="margin-bottom: 8px;">{badges_html}</div>
             <div class="citation-title">{title}</div>
-            <div class="citation-meta"><strong>PMID:</strong> {pmid}</div>
+            <div class="citation-meta"><strong>PMID:</strong> {pmid} | <strong>Year:</strong> {year_str}</div>
             <div class="citation-meta"><strong>Authors:</strong> {authors}</div>
         </div>
         """

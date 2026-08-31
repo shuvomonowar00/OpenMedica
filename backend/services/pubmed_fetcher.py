@@ -137,6 +137,14 @@ def _sync_fetch_articles(topic: str, max_results: int, high_evidence_only: bool 
                 pub_type_list = article_data.get("PublicationTypeList", [])
                 for pt in pub_type_list:
                     publication_types.append(str(pt))
+                    
+                # Extract publication year
+                pub_year = 0
+                journal = article_data.get("Journal", {})
+                pub_date = journal.get("JournalIssue", {}).get("PubDate", {})
+                year_str = str(pub_date.get("Year", ""))
+                if year_str.isdigit():
+                    pub_year = int(year_str)
                 
                 # Attempt to find a PMCID for full-text
                 pmcid = None
@@ -168,7 +176,8 @@ def _sync_fetch_articles(topic: str, max_results: int, high_evidence_only: bool 
                         abstract=abstract,
                         authors=authors,
                         sections=sections,
-                        publication_types=publication_types
+                        publication_types=publication_types,
+                        pub_year=pub_year
                     )
                 )
             except Exception as parse_error:

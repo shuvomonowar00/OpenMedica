@@ -45,21 +45,34 @@ reviewer_agent = Agent(
     system_prompt=REVIEWER_PROMPT,
 )
 
-async def generate_answer(query: str, n_results: int = 5) -> AgentChatResponse:
+async def generate_answer(query: str, history: List[dict] = None, filters: dict = None, n_results: int = 5) -> AgentChatResponse:
     """
     Retrieves context from the vector store and generates a strict, 
     zero-hallucination response using Pydantic AI's multi-agent loop.
     """
+    if history is None:
+        history = []
+    
+    # Format conversational history into a clean transcript for the agent
+    history_transcript = ""
+    if history:
+        history_transcript = "--- Previous Conversation History ---\n"
+        for msg in history:
+            role = "User" if msg.get("role") == "user" else "AI"
+            content = msg.get("content", "")
+            history_transcript += f"{role}: {content}\n\n"
+        history_transcript += "-------------------------------------\n\n"
+
     # 1. Expand query for better retrieval recall
     expansion = await expand_query(query)
     search_query = " ".join([query] + expansion.mesh_terms)
     
-    # 2. Retrieve context
-    articles = vector_store.query_articles(search_query, n_results=n_results)
+    # 2. Retrieve context with UI Filters
+    articles = vector_store.query_articles(search_query, filters=filters, n_results=n_results)
     
     # 3. Format context
     if not articles:
-        context_str = "No relevant PubMed articles found."
+        context_str = "No relevant PubMed articles found for the given criteria."
     else:
         context_parts = []
         for a in articles:
@@ -68,9 +81,9 @@ async def generate_answer(query: str, n_results: int = 5) -> AgentChatResponse:
             context_parts.append(f"--- PMID: {a.pmid}{pmc_info} | Type: {pub_types} ---\nTitle: {a.title}\nContent:\n{a.abstract}")
         context_str = "\n\n".join(context_parts)
     
-    user_prompt = f"Context from PubMed:\n{context_str}\n\nUser Query: {query}"
+    user_prompt = f"{history_transcript}Context from PubMed:\n{context_str}\n\nNew User Query: {query}"
     
-    logger.info(f"Running Synthesizer Agent for query: '{query}' with {len(articles)} sources.")
+    logger.info(f"Running Synthesizer Agent for query: '{query}' with {len(articles)} sources and filters: {filters}")
     
     # 4. Multi-Agent Verification Loop
     synth_result = await rag_agent.run(user_prompt)

@@ -29,7 +29,22 @@ def handle_chat_input():
                 st.write("Expanding MeSH terms...")
                 st.write("Retrieving evidence from ChromaDB...")
                 st.write("Multi-agent synthesis and review...")
-                res = send_chat(prompt)
+                
+                # Fetch filters from session state
+                study_type = st.session_state.get("filter_study_type", "All")
+                date_filter = st.session_state.get("filter_date", "All Time")
+                
+                # We need to exclude the newly added user prompt from the history we send
+                # because `add_message` just added it. So we slice [:-1]
+                history = st.session_state.chat_history[:-1]
+                
+                res = send_chat(
+                    query=prompt, 
+                    history=history, 
+                    study_type=study_type, 
+                    date_filter=date_filter
+                )
+                
                 status.update(label="Analysis complete!", state="complete", expanded=False)
                 
             if "error" in res:

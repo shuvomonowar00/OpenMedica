@@ -45,6 +45,21 @@ def render_sidebar():
         
         st.markdown("---")
         
+        # Search Filters Section
+        st.subheader("Search Filters")
+        st.session_state.filter_study_type = st.selectbox(
+            "Evidence Level", 
+            ["All", "RCTs Only", "Meta-Analyses Only"],
+            index=0
+        )
+        st.session_state.filter_date = st.selectbox(
+            "Date Range",
+            ["All Time", "Last Year", "Last 5 Years"],
+            index=0
+        )
+        
+        st.markdown("---")
+        
         # Chat Controls
         if st.button("Clear Chat History", use_container_width=True):
             clear_chat()
