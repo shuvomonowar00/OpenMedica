@@ -1,5 +1,5 @@
 import streamlit as st
-from core.api_client import ingest_data, get_cached_database_status
+from core.api_client import get_cached_database_status
 from core.state_manager import clear_chat
 
 def render_sidebar():
@@ -23,27 +23,7 @@ def render_sidebar():
         
         st.markdown("---")
         
-        # Data Ingestion Section
-        st.subheader("Ingest New Data")
-        with st.form("ingest_form"):
-            topic = st.text_input("PubMed Topic", placeholder="e.g. Asthma, COVID-19")
-            max_results = st.number_input("Max Articles", min_value=1, max_value=50, value=5)
-            submit_ingest = st.form_submit_button("Ingest")
-            
-            if submit_ingest:
-                if not topic:
-                    st.warning("Please enter a topic.")
-                else:
-                    with st.spinner(f"Fetching {max_results} articles for '{topic}'..."):
-                        ingest_res = ingest_data(topic, max_results)
-                        if "error" in ingest_res:
-                            st.error(f"Error: {ingest_res['error']}")
-                        else:
-                            st.success(f"Successfully ingested {ingest_res.get('articles_ingested', 0)} articles!")
-                            get_cached_database_status.clear() # Clear cache so new count shows up
-                            st.rerun() # Refresh to show new count
-        
-        st.markdown("---")
+
         
         # Search Filters Section
         st.subheader("Search Filters")

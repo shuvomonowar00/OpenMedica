@@ -129,6 +129,8 @@ async def view_database():
                 "pmid": meta.get("pmid", ""),
                 "title": meta.get("title", ""),
                 "authors": meta.get("authors", ""),
+                "pub_year": meta.get("pub_year", 0),
+                "publication_types": meta.get("publication_types", ""),
                 "abstract": doc
             })
             

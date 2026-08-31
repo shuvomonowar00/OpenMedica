@@ -26,6 +26,7 @@ from components.sidebar import render_sidebar
 from components.chat_interface import render_chat_messages, handle_chat_input
 from components.citation_panel import render_citation_panel
 from components.knowledge_base import render_knowledge_base
+from components.ingestion import render_ingestion_page
 
 # --- Initialize State ---
 initialize_state()
@@ -34,7 +35,10 @@ initialize_state()
 render_sidebar()
 
 # OpenEvidence style layout with Tabs for extra features
-tab_chat, tab_kb = st.tabs(["💬 Chat Interface", "📚 Knowledge Base Explorer"])
+tab_ingest, tab_chat, tab_kb = st.tabs(["📥 Data Ingestion", "💬 Chat Interface", "📚 Knowledge Base Explorer"])
+
+with tab_ingest:
+    render_ingestion_page()
 
 with tab_chat:
     col_chat, col_sources = st.columns([2, 1], gap="large")
