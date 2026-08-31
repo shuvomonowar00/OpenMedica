@@ -12,7 +12,7 @@ def initialize_state():
     if "current_citations" not in st.session_state:
         st.session_state.current_citations = []
 
-def add_message(role: str, content: str, citations: list = None):
+def add_message(role: str, content: str, citations: list = None, raw_data: dict = None):
     """
     Appends a message to the chat history.
     """
@@ -22,7 +22,8 @@ def add_message(role: str, content: str, citations: list = None):
     st.session_state.chat_history.append({
         "role": role,
         "content": content,
-        "citations": citations
+        "citations": citations,
+        "raw_data": raw_data
     })
     
     if role == "assistant":

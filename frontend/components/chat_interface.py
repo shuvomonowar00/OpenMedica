@@ -1,14 +1,39 @@
 import streamlit as st
 from core.state_manager import add_message
 from core.api_client import send_chat
+from utils.export import generate_markdown_report
 
 def render_chat_messages():
     """
     Iterates through session state chat history and renders each message.
     """
-    for msg in st.session_state.chat_history:
+    history = st.session_state.chat_history
+    for i, msg in enumerate(history):
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"], unsafe_allow_html=True)
+            
+            # If this is an AI message and has raw_data, show export options
+            if msg["role"] == "assistant" and msg.get("raw_data"):
+                # Find the user's query that prompted this response
+                query = "Unknown Query"
+                if i > 0 and history[i-1]["role"] == "user":
+                    query = history[i-1]["content"]
+                    
+                md_report = generate_markdown_report(query, msg["raw_data"])
+                
+                # Render Export buttons seamlessly inline
+                col1, col2 = st.columns([1, 4])
+                with col1:
+                    st.download_button(
+                        label="📥 Download (.md)",
+                        data=md_report,
+                        file_name="clinical_report.md",
+                        mime="text/markdown",
+                        key=f"dl_{i}"
+                    )
+                with col2:
+                    with st.popover("📋 View/Copy Note"):
+                        st.code(md_report, language="markdown")
 
 def handle_chat_input():
     """
@@ -90,7 +115,7 @@ def handle_chat_input():
                 full_content += answer
                 
                 st.markdown(full_content, unsafe_allow_html=True)
-                add_message("assistant", full_content, sources)
+                add_message("assistant", full_content, sources, raw_data=res)
                 
                 # Force a rerun to update the citation panel if needed
                 st.rerun()
