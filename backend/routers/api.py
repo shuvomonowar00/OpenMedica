@@ -50,8 +50,20 @@ async def chat(request: ChatRequest) -> ChatResponse:
     """
     try:
         # Generate the answer using our Pydantic AI agent and vector store context
-        response = await generate_answer(request.query)
-        return response
+        agent_response = await generate_answer(request.query)
+        
+        # Enrich the PMIDs with full citation data for the UI
+        pmids = agent_response.sources
+        citation_data = vector_store.get_articles_by_pmids(pmids)
+        
+        return ChatResponse(
+            population=agent_response.population,
+            intervention=agent_response.intervention,
+            comparison=agent_response.comparison,
+            outcome=agent_response.outcome,
+            answer=agent_response.answer,
+            sources=citation_data
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Chat generation failed: {str(e)}")
 

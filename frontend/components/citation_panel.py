@@ -17,12 +17,27 @@ def render_citation_panel():
         pmid = cit.get("pmid", "N/A")
         title = cit.get("title", "Unknown Title")
         authors = cit.get("authors", "Unknown Authors")
-        pub_date = cit.get("pub_date", "Unknown Date")
+        pub_types = cit.get("publication_types", [])
+        
+        # Build badges HTML
+        badges_html = ""
+        if not pub_types:
+            badges_html = '<span class="badge badge-standard">Study</span>'
+        else:
+            for pt in pub_types:
+                pt_lower = pt.lower()
+                if "randomized controlled trial" in pt_lower:
+                    badges_html += '<span class="badge badge-rct">RCT</span>'
+                elif "meta-analysis" in pt_lower or "systematic review" in pt_lower:
+                    badges_html += f'<span class="badge badge-meta">{pt}</span>'
+                else:
+                    badges_html += f'<span class="badge badge-standard">{pt}</span>'
         
         card_html = f"""
         <div class="citation-card">
+            <div style="margin-bottom: 8px;">{badges_html}</div>
             <div class="citation-title">{title}</div>
-            <div class="citation-meta"><strong>PMID:</strong> {pmid} | <strong>Date:</strong> {pub_date}</div>
+            <div class="citation-meta"><strong>PMID:</strong> {pmid}</div>
             <div class="citation-meta"><strong>Authors:</strong> {authors}</div>
         </div>
         """

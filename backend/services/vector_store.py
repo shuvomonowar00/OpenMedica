@@ -232,6 +232,24 @@ class VectorStore:
         else:
             logger.info(f"No chunks found for PMID {pmid} to delete.")
 
+    def get_articles_by_pmids(self, pmids: List[str]) -> List[dict]:
+        """Returns rich citation metadata for a list of PMIDs."""
+        results = {}
+        for meta in self.bm25_metadatas:
+            pmid = str(meta.get("pmid"))
+            if pmid in pmids and pmid not in results:
+                pub_types_str = meta.get("publication_types", "")
+                pub_types = pub_types_str.split(", ") if pub_types_str else []
+                results[pmid] = {
+                    "pmid": pmid,
+                    "title": meta.get("title", "Unknown Title"),
+                    "authors": meta.get("authors", "Unknown Authors"),
+                    "publication_types": pub_types
+                }
+        
+        # Preserve input order
+        return [results[p] for p in pmids if p in results]
+
 # Singleton instance to be used across the app
 DB_DIR = os.path.join(os.path.dirname(__file__), "..", ".chroma_data")
 vector_store = VectorStore(db_path=DB_DIR)

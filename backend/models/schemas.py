@@ -46,11 +46,27 @@ class ChatRequest(BaseModel):
     """Schema for user chat queries."""
     query: str = Field(..., description="The user's medical question")
 
-class ChatResponse(BaseModel):
-    """Schema for RAG chat responses, ensuring strict structure."""
+class AgentChatResponse(BaseModel):
+    """Schema for Pydantic AI RAG chat responses."""
     population: str = Field(..., description="Description of the patient population or problem")
     intervention: str = Field(..., description="Description of the intervention or exposure")
     comparison: str = Field(default="N/A", description="Description of the comparison or control. Use 'N/A' if none.")
     outcome: str = Field(..., description="Description of the clinical outcome")
     answer: str = Field(..., description="The synthesized final answer based on the PICO context")
     sources: list[str] = Field(default_factory=list, description="List of PMIDs used as sources")
+
+class CitationData(BaseModel):
+    """Rich metadata for a cited source to render UI badges."""
+    pmid: str
+    title: str
+    authors: str
+    publication_types: List[str] = Field(default_factory=list)
+
+class ChatResponse(BaseModel):
+    """Schema for the REST API response returned to the frontend."""
+    population: str
+    intervention: str
+    comparison: str
+    outcome: str
+    answer: str
+    sources: List[CitationData]

@@ -1,7 +1,7 @@
 import logging
 from typing import List
 from pydantic_ai import Agent, RunContext
-from models.schemas import ChatResponse, PubMedArticle, ReviewSchema
+from models.schemas import AgentChatResponse, PubMedArticle, ReviewSchema
 from services.llm_factory import get_llm
 from services.vector_store import vector_store
 from services.query_expansion import expand_query
@@ -27,7 +27,7 @@ Return your answer strictly in the requested JSON structure.
 
 rag_agent = Agent(
     model=get_llm(),
-    output_type=ChatResponse,
+    output_type=AgentChatResponse,
     system_prompt=SYSTEM_PROMPT,
 )
 
@@ -45,7 +45,7 @@ reviewer_agent = Agent(
     system_prompt=REVIEWER_PROMPT,
 )
 
-async def generate_answer(query: str, n_results: int = 5) -> ChatResponse:
+async def generate_answer(query: str, n_results: int = 5) -> AgentChatResponse:
     """
     Retrieves context from the vector store and generates a strict, 
     zero-hallucination response using Pydantic AI's multi-agent loop.
