@@ -78,7 +78,8 @@ def render_knowledge_base():
         use_container_width=True,
         hide_index=True,
         selection_mode="single-row",
-        on_select="rerun"
+        on_select="rerun",
+        key="kb_table"
     )
     
     # Check if a row was clicked
@@ -88,3 +89,6 @@ def render_knowledge_base():
         selected_index = selected_rows[0]
         selected_article = articles[selected_index]
         showcase_literature_modal(selected_article)
+        
+        # Override the session state to clear the selection when the modal is closed
+        st.session_state["kb_table"] = {"selection": {"rows": [], "columns": []}}

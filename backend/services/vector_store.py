@@ -255,7 +255,7 @@ class VectorStore:
         # Note: Delete requires knowing exactly which ids to delete.
         # The chunks are named pmid_sec_0, pmid_sec_1, etc.
         # We need to find all ids that start with pmid
-        ids_to_delete = [cid for cid in self.bm25_ids if cid.startswith(f"{pmid}_sec_")]
+        ids_to_delete = [cid for cid in self.bm25_ids if cid.startswith(f"{pmid}_sec_") or cid == pmid]
         if ids_to_delete:
             self.collection.delete(ids=ids_to_delete)
             logger.info(f"Deleted article with PMID {pmid} from ChromaDB.")
