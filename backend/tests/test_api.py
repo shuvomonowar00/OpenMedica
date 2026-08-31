@@ -13,10 +13,17 @@ def test_health_check():
     assert response.json() == {"status": "ok"}
 
 def test_ingest_endpoint():
+    from models.schemas import QueryExpansionSchema
     # Mock the external dependencies
-    with patch("routers.api.fetch_abstracts") as mock_fetch, \
+    with patch("routers.api.expand_query") as mock_expand, \
+         patch("routers.api.fetch_abstracts") as mock_fetch, \
          patch("routers.api.vector_store.add_articles") as mock_add:
         
+        mock_expand.return_value = QueryExpansionSchema(
+            original_query="Cancer",
+            mesh_terms=["Neoplasms"],
+            expanded_search_queries=["Cancer OR Neoplasms"]
+        )
         mock_fetch.return_value = [] # Empty list of articles
         
         response = client.post("/api/ingest", json={"topic": "Cancer", "max_results": 2, "high_evidence_only": True})
@@ -24,7 +31,8 @@ def test_ingest_endpoint():
         assert response.status_code == 200
         assert "Successfully fetched" in response.json()["message"]
         assert response.json()["articles_ingested"] == 0
-        mock_fetch.assert_called_once_with(topic="Cancer", max_results=2, high_evidence_only=True)
+        mock_expand.assert_called_once_with("Cancer")
+        mock_fetch.assert_called_once_with(topic="Cancer OR Neoplasms", max_results=2, high_evidence_only=True)
 
 def test_chat_endpoint():
     # Mock the RAG agent response

@@ -62,3 +62,26 @@ def test_add_and_query_articles(mock_vector_store):
     assert "Randomized Controlled Trial" in returned_article.publication_types
     # Check that the chunk text is formatted properly in the abstract field
     assert "[Methods]" in returned_article.abstract or "[Results]" in returned_article.abstract
+
+def test_delete_article(mock_vector_store):
+    from models.schemas import ArticleSection
+    
+    mock_articles = [
+        PubMedArticle(
+            pmid="77777",
+            title="Delete Me",
+            abstract="Fallback",
+            sections=[ArticleSection(section_title="Methods", content="Delete this")]
+        )
+    ]
+    
+    mock_vector_store.add_articles(mock_articles)
+    assert len(mock_vector_store.bm25_ids) >= 1
+    
+    mock_vector_store.delete_article("77777")
+    
+    # Assert BM25 cache is cleaned
+    assert not any(cid.startswith("77777") for cid in mock_vector_store.bm25_ids)
+    
+    results = mock_vector_store.query_articles("Delete", n_results=1)
+    assert len(results) == 0

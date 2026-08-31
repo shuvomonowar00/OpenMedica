@@ -106,6 +106,9 @@ class VectorStore:
                 self.bm25 = BM25Okapi(tokenized_corpus)
                 logger.info(f"Initialized BM25 index with {len(docs)} documents.")
             else:
+                self.bm25_corpus = []
+                self.bm25_metadatas = []
+                self.bm25_ids = []
                 self.bm25 = None
         except Exception as e:
             logger.warning(f"Failed to initialize BM25: {e}")
