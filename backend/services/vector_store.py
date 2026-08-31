@@ -17,13 +17,27 @@ class GeminiEmbeddingFunction(EmbeddingFunction):
         self.client = genai.Client(api_key=api_key)
 
     def __call__(self, input: Documents) -> Embeddings:
+        import time
         embeddings = []
         for text in input:
-            response = self.client.models.embed_content(
-                model=self.model_name,
-                contents=text,
-            )
-            embeddings.append(response.embeddings[0].values)
+            max_retries = 5
+            for attempt in range(max_retries):
+                try:
+                    response = self.client.models.embed_content(
+                        model=self.model_name,
+                        contents=text,
+                    )
+                    embeddings.append(response.embeddings[0].values)
+                    break
+                except Exception as e:
+                    if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
+                        if attempt < max_retries - 1:
+                            logger.warning(f"Gemini Rate Limit hit. Sleeping for {2 ** attempt} seconds...")
+                            time.sleep(2 ** attempt)
+                        else:
+                            raise e
+                    else:
+                        raise e
         return embeddings
 
 class OpenAIEmbeddingFunction(EmbeddingFunction):
