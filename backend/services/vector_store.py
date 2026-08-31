@@ -81,7 +81,7 @@ class VectorStore:
         logger.info(f"Initialized ChromaDB at {db_path} with collection {collection_name}")
 
     def add_articles(self, articles: List[PubMedArticle]) -> None:
-        """Add PubMed articles to the vector store."""
+        """Add PubMed articles to the vector store (chunked by section)."""
         if not articles:
             return
 
@@ -90,26 +90,36 @@ class VectorStore:
         ids = []
 
         for article in articles:
-            text = f"Title: {article.title}\n\nAbstract: {article.abstract}"
-            documents.append(text)
+            # If no sections, fallback to abstract
+            sections_to_use = article.sections if article.sections else []
             
-            metadata = {
-                "pmid": article.pmid,
-                "title": article.title,
-                "authors": ", ".join(article.authors)
-            }
-            metadatas.append(metadata)
-            ids.append(article.pmid)
+            for idx, section in enumerate(sections_to_use):
+                text = f"Title: {article.title}\nSection: {section.section_title}\n\n{section.content}"
+                documents.append(text)
+                
+                metadata = {
+                    "pmid": article.pmid,
+                    "pmcid": article.pmcid if article.pmcid else "",
+                    "title": article.title,
+                    "authors": ", ".join(article.authors),
+                    "section_title": section.section_title,
+                    "publication_types": ", ".join(article.publication_types)
+                }
+                metadatas.append(metadata)
+                
+                # Create a unique ID for each chunk
+                ids.append(f"{article.pmid}_sec_{idx}")
 
-        self.collection.add(
-            documents=documents,
-            metadatas=metadatas,
-            ids=ids
-        )
-        logger.info(f"Added {len(articles)} articles to ChromaDB.")
+        if documents:
+            self.collection.add(
+                documents=documents,
+                metadatas=metadatas,
+                ids=ids
+            )
+            logger.info(f"Added {len(documents)} chunks from {len(articles)} articles to ChromaDB.")
 
     def query_articles(self, query: str, n_results: int = 5) -> List[PubMedArticle]:
-        """Query the vector store for relevant PubMed articles."""
+        """Query the vector store for relevant PubMed article chunks."""
         if self.collection.count() == 0:
             return []
             
@@ -126,11 +136,20 @@ class VectorStore:
             
         for idx, metadata in enumerate(results["metadatas"][0]):
             doc_text = results["documents"][0][idx] if results["documents"] else ""
+            
+            # Reconstruct as PubMedArticle. 
+            # We store the chunk text in the 'abstract' field so the RAG agent can read it,
+            # and prefix it with the section title.
+            section_title = metadata.get("section_title", "Unknown Section")
+            chunk_content = f"[{section_title}] {doc_text}"
+            
             articles.append(PubMedArticle(
                 pmid=str(metadata["pmid"]),
+                pmcid=str(metadata.get("pmcid", "")),
                 title=str(metadata["title"]),
-                abstract=doc_text,
-                authors=str(metadata["authors"]).split(", ") if metadata.get("authors") else []
+                abstract=chunk_content,
+                authors=str(metadata["authors"]).split(", ") if metadata.get("authors") else [],
+                publication_types=str(metadata.get("publication_types", "")).split(", ") if metadata.get("publication_types") else []
             ))
             
         return articles

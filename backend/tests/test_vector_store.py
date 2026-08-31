@@ -28,12 +28,20 @@ def mock_vector_store(tmp_path):
     return store
 
 def test_add_and_query_articles(mock_vector_store):
+    from models.schemas import ArticleSection
+    
     mock_articles = [
         PubMedArticle(
             pmid="12345",
+            pmcid="PMC12345",
             title="Test Medical Article",
-            abstract="This is a mock abstract for testing.",
-            authors=["Doctor A", "Doctor B"]
+            abstract="Fallback abstract",
+            authors=["Doctor A", "Doctor B"],
+            publication_types=["Randomized Controlled Trial"],
+            sections=[
+                ArticleSection(section_title="Methods", content="This is the methodology."),
+                ArticleSection(section_title="Results", content="These are the results.")
+            ]
         )
     ]
     
@@ -41,9 +49,16 @@ def test_add_and_query_articles(mock_vector_store):
     mock_vector_store.add_articles(mock_articles)
     
     # Test querying articles
-    results = mock_vector_store.query_articles("mock abstract", n_results=1)
+    results = mock_vector_store.query_articles("methodology", n_results=2)
     
-    assert len(results) == 1
-    assert results[0].pmid == "12345"
-    assert results[0].title == "Test Medical Article"
-    assert "Doctor A" in results[0].authors
+    assert len(results) >= 1
+    # Check that metadata was reconstructed correctly
+    # The exact result order might vary due to dummy embeddings, so we check the first one
+    returned_article = results[0]
+    assert returned_article.pmid == "12345"
+    assert returned_article.pmcid == "PMC12345"
+    assert returned_article.title == "Test Medical Article"
+    assert "Doctor A" in returned_article.authors
+    assert "Randomized Controlled Trial" in returned_article.publication_types
+    # Check that the chunk text is formatted properly in the abstract field
+    assert "[Methods]" in returned_article.abstract or "[Results]" in returned_article.abstract

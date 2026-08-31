@@ -38,7 +38,9 @@ async def generate_answer(query: str, n_results: int = 5) -> ChatResponse:
     else:
         context_parts = []
         for a in articles:
-            context_parts.append(f"--- PMID: {a.pmid} ---\nTitle: {a.title}\n{a.abstract}")
+            pmc_info = f" | PMCID: {a.pmcid}" if a.pmcid else ""
+            pub_types = ", ".join(a.publication_types) if a.publication_types else "Unknown Study Type"
+            context_parts.append(f"--- PMID: {a.pmid}{pmc_info} | Type: {pub_types} ---\nTitle: {a.title}\nContent:\n{a.abstract}")
         context_str = "\n\n".join(context_parts)
     
     user_prompt = f"Context from PubMed:\n{context_str}\n\nUser Query: {query}"

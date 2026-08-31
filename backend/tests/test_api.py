@@ -19,12 +19,12 @@ def test_ingest_endpoint():
         
         mock_fetch.return_value = [] # Empty list of articles
         
-        response = client.post("/api/ingest", json={"topic": "Cancer", "max_results": 2})
+        response = client.post("/api/ingest", json={"topic": "Cancer", "max_results": 2, "high_evidence_only": True})
         
         assert response.status_code == 200
         assert "Successfully fetched" in response.json()["message"]
         assert response.json()["articles_ingested"] == 0
-        mock_fetch.assert_called_once_with(topic="Cancer", max_results=2)
+        mock_fetch.assert_called_once_with(topic="Cancer", max_results=2, high_evidence_only=True)
 
 def test_chat_endpoint():
     # Mock the RAG agent response

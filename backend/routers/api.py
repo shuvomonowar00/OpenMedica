@@ -18,7 +18,11 @@ async def ingest_data(request: IngestRequest) -> IngestResponse:
     """
     try:
         # Fetch real data using the pubmed_fetcher service
-        articles = await fetch_abstracts(topic=request.topic, max_results=request.max_results)
+        articles = await fetch_abstracts(
+            topic=request.topic, 
+            max_results=request.max_results,
+            high_evidence_only=request.high_evidence_only
+        )
         
         # Store articles in ChromaDB
         if articles:
