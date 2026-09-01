@@ -33,7 +33,21 @@ OpenMedica/
 
 ## 🚀 Getting Started
 
-*(Detailed setup instructions will be added as the project progresses through its development phases.)*
+To run this project locally, you must first configure your environment variables:
+
+1. Copy the template environment file:
+   ```bash
+   cp .env.example .env
+   ```
+2. Open the newly created `.env` file and replace the placeholder values (e.g., `your_gemini_api_key_here`, `your_preferred_gemini_model_here`) with your actual API keys and preferred models.
+
+### Running with Docker
+
+This project is fully containerized:
+```bash
+docker-compose build
+docker-compose up
+```
 
 ## 📜 License
 
