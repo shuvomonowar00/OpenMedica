@@ -12,10 +12,28 @@
 
 <br>
   
-<!-- Placeholder for your UI Demo Screenshot or GIF -->
-![OpenMedica UI Demo](https://via.placeholder.com/800x400.png?text=OpenMedica+UI+Screenshot+Placeholder)
+![OpenMedica Chat Interface](screenshots/chat-interface.png)
 
 </div>
+
+---
+
+## 📸 Application Showcase
+
+### 1. Clinical Chat Interface (PICO-Formatted RAG)
+The core multi-agent chat interface. The AI strictly extracts Population, Intervention, Comparison, and Outcome (PICO) data from retrieved PubMed literature. Verified citations with evidence-level badges (e.g., RCT, Meta-Analysis) are rendered dynamically in the sidebar.
+
+![Chat Interface](screenshots/chat-interface.png)
+
+### 2. Data Ingestion Command Center
+An advanced UI query builder that connects directly to the PubMed API. Easily fetch and index clinical abstracts and full-text PMCs directly into the local ChromaDB vector store with smart boolean filtering.
+
+![Data Ingestion](screenshots/data-ingestion.png)
+
+### 3. Knowledge Base Explorer
+A live, searchable data grid showing exactly what literature is currently embedded in your vector database, including publication years, evidence types, and interactive PMC abstracts.
+
+![Knowledge Base Explorer](screenshots/knowledge-base-explorer.png)
 
 ---
 
@@ -75,7 +93,7 @@ To run this project locally, you must first configure your API keys and environm
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/OpenMedica.git
+git clone https://github.com/shuvomonowar00/OpenMedica.git
 cd OpenMedica
 
 # Copy the template environment file

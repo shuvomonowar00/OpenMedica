@@ -118,5 +118,16 @@ async def generate_answer(query: str, history: List[dict] = None, filters: dict 
         
     # Attach transparency data
     draft.mesh_terms = expansion.mesh_terms
+    
+    # Guarantee that the UI receives the sources that were retrieved
+    retrieved_pmids = [a.pmid for a in articles] if articles else []
+    
+    # Merge LLM-identified sources with retrieved PMIDs to ensure the Citation Panel always renders
+    # (Sometimes the LLM forgets to populate the list[str] field correctly)
+    if not draft.sources:
+        draft.sources = retrieved_pmids
+    else:
+        # Keep only valid PMIDs and ensure no duplicates
+        draft.sources = list(set(draft.sources + retrieved_pmids))
         
     return draft
