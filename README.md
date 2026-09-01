@@ -20,20 +20,20 @@
 
 ## 📸 Application Showcase
 
-### 1. Clinical Chat Interface (PICO-Formatted RAG)
-The core multi-agent chat interface. The AI strictly extracts Population, Intervention, Comparison, and Outcome (PICO) data from retrieved PubMed literature. Verified citations with evidence-level badges (e.g., RCT, Meta-Analysis) are rendered dynamically in the sidebar.
-
-![Chat Interface](screenshots/chat-interface.png)
-
-### 2. Data Ingestion Command Center
+### 1. Data Ingestion Command Center
 An advanced UI query builder that connects directly to the PubMed API. Easily fetch and index clinical abstracts and full-text PMCs directly into the local ChromaDB vector store with smart boolean filtering.
 
 ![Data Ingestion](screenshots/data-ingestion.png)
 
-### 3. Knowledge Base Explorer
+### 2. Knowledge Base Explorer
 A live, searchable data grid showing exactly what literature is currently embedded in your vector database, including publication years, evidence types, and interactive PMC abstracts.
 
 ![Knowledge Base Explorer](screenshots/knowledge-base-explorer.png)
+
+### 3. Clinical Chat Interface (PICO-Formatted RAG)
+The core multi-agent chat interface. The AI strictly extracts Population, Intervention, Comparison, and Outcome (PICO) data from retrieved PubMed literature. Verified citations with evidence-level badges (e.g., RCT, Meta-Analysis) are rendered dynamically in the sidebar.
+
+![Chat Interface](screenshots/chat-interface.png)
 
 ---
 
