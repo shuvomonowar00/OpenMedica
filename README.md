@@ -101,7 +101,18 @@ cd OpenMedica
 # Copy the template environment file
 cp .env.example .env
 ```
-Open the newly created `.env` file and replace the placeholder values (e.g., `your_gemini_api_key_here`) with your actual API keys and preferred LLM models.
+Open the newly created `.env` file to configure your keys. 
+
+**🤖 Model Agnostic Design:**
+OpenMedica is built with a dynamic LLM factory. You are **not** locked into a single provider! You can seamlessly switch the entire Multi-Agent pipeline between Google, OpenAI, or Anthropic simply by changing the `ACTIVE_LLM_PROVIDER` variable—zero code changes required:
+
+```env
+# Switch between providers instantly:
+ACTIVE_LLM_PROVIDER=gemini      # Uses Gemini 1.5 (Default)
+# ACTIVE_LLM_PROVIDER=openai    # Uses GPT-4o
+# ACTIVE_LLM_PROVIDER=anthropic # Uses Claude 3.5 Sonnet
+```
+Make sure to also provide the corresponding API key (`GEMINI_API_KEY`, `OPENAI_API_KEY`, or `ANTHROPIC_API_KEY`) for your active provider.
 
 ### 2. Docker Deployment (Quickstart)
 The easiest way to run OpenMedica is via our pre-configured Docker containers.
