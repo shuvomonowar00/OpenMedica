@@ -3,9 +3,9 @@ import os
 from core.api_client import get_cached_database_status
 from core.state_manager import clear_chat
 
-@st.dialog("⚠️ Clear Chat Memory")
+@st.dialog("Clear Chat Memory")
 def clear_memory_dialog():
-    st.warning("You are about to delete all conversational history. The AI will lose all context of your current diagnostic session.")
+    st.warning("You are about to delete all conversational history. The AI will lose all context of your current diagnostic session.", icon=":material/warning:")
     st.markdown("This action **cannot be undone**.")
     
     col1, col2 = st.columns(2)
@@ -13,7 +13,7 @@ def clear_memory_dialog():
         if st.button("Cancel", use_container_width=True):
             st.rerun()
     with col2:
-        if st.button("🚨 Yes, Clear Memory", type="primary", use_container_width=True):
+        if st.button(":material/delete_forever: Yes, Clear Memory", type="primary", use_container_width=True):
             clear_chat()
             st.session_state.show_clear_toast = True
             st.rerun()
@@ -25,17 +25,17 @@ def render_sidebar():
     """
     with st.sidebar:
         # Left-align the title and pull it up so it sits exactly on the same line as the toggle button (ChatGPT style)
-        st.markdown("<h1 style='text-align: left; margin-bottom: 0; margin-top: -15px; font-size: 1.6rem;'>🔬 OpenMedica</h1>", unsafe_allow_html=True)
+        st.markdown("<h1 style='text-align: left; margin-bottom: 0; margin-top: -15px; font-size: 1.6rem;'><span class='material-symbols-rounded' style='vertical-align: middle; color: #111827;'>medical_services</span> OpenMedica</h1>", unsafe_allow_html=True)
         st.markdown("<p style='text-align: left; color: #64748b; font-size: 0.9rem; margin-top: -5px;'>AI Clinical Assistant</p>", unsafe_allow_html=True)
         st.markdown("<br>", unsafe_allow_html=True)
         
         # -------------------------------------------------------------
         # 0. Navigation Menu
         # -------------------------------------------------------------
-        st.markdown("### 📍 Navigation")
+        st.markdown("### :material/explore: Navigation")
         selected_page = st.radio(
             "Go to",
-            ["📥 Data Ingestion", "💬 Chat Interface", "📚 Knowledge Base Explorer"],
+            [":material/cloud_download: Data Ingestion", ":material/chat: Chat Interface", ":material/local_library: Knowledge Base Explorer"],
             label_visibility="collapsed"
         )
         st.markdown("<br>", unsafe_allow_html=True)
@@ -43,40 +43,42 @@ def render_sidebar():
         # -------------------------------------------------------------
         # 1. System Health Dashboard
         # -------------------------------------------------------------
-        st.markdown("### 🖥️ System Health")
+        st.markdown("### :material/monitor_heart: System Health")
         
         status_res = get_cached_database_status()
+        llm_engine = os.environ.get("ACTIVE_LLM_PROVIDER", "gemini").capitalize()
         
         if "error" in status_res:
-            st.error("🔴 Vector Database Offline")
+            db_status_text = "Offline"
+            db_status_color = "#ef4444" # Premium soft red
+            total_articles = 0
         else:
+            db_status_text = "Online"
+            db_status_color = "#22c55e" # Premium soft green
             total_articles = status_res.get("total_articles", 0)
             
-            # Read LLM Provider from environment, default to Gemini if not set
-            llm_engine = os.environ.get("LLM_PROVIDER", "gemini").capitalize()
-            
-            st.markdown(f"""
-            <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; font-size: 0.9rem;">
-                <div style="margin-bottom: 8px;">
-                    <span style="color: #16a34a; font-size: 1.1em;">●</span> <b>Vector Database:</b> Online
-                </div>
-                <div style="margin-bottom: 8px;">
-                    <b>📚 Documents Loaded:</b> {total_articles}
-                </div>
-                <div>
-                    <b>🧠 AI Engine:</b> {llm_engine}
-                </div>
+        st.markdown(f"""
+        <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; font-size: 0.9rem;">
+            <div style="margin-bottom: 8px;">
+                <span style="color: {db_status_color}; font-size: 1.1em;">●</span> <b>Vector Database:</b> {db_status_text}
             </div>
-            """, unsafe_allow_html=True)
+            <div style="margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                <span class="material-symbols-rounded" style="font-size: 1rem; color: #64748b;">description</span> <b>Documents Loaded:</b> {total_articles}
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <span class="material-symbols-rounded" style="font-size: 1rem; color: #64748b;">memory</span> <b>AI Engine:</b> {llm_engine}
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
             
         # -------------------------------------------------------------
         # CONDITIONAL CHAT INTERFACE CONTROLS
         # -------------------------------------------------------------
-        if selected_page == "💬 Chat Interface":
+        if selected_page == ":material/chat: Chat Interface":
             st.markdown("<br>", unsafe_allow_html=True)
             
             # 2. Clinical Filters
-            st.markdown("### 🩺 Clinical Filters")
+            st.markdown("### :material/filter_alt: Clinical Filters")
             st.session_state.filter_study_type = st.selectbox(
                 "Evidence Level", 
                 ["All", "RCTs Only", "Meta-Analyses Only"],
@@ -93,7 +95,7 @@ def render_sidebar():
             st.markdown("<br>", unsafe_allow_html=True)
             
             # 3. RAG Tuning (Advanced Settings)
-            st.markdown("### 🧠 AI RAG Tuning")
+            st.markdown("### :material/tune: AI RAG Tuning")
             if "retrieval_depth" not in st.session_state:
                 st.session_state.retrieval_depth = 5
                 
@@ -111,7 +113,7 @@ def render_sidebar():
             # Add dynamic spacer to push the following content to the absolute bottom
             st.markdown('<div class="sidebar-spacer"></div>', unsafe_allow_html=True)
             
-            if st.button("🗑️ Clear Chat Memory", type="secondary", use_container_width=True):
+            if st.button(":material/delete: Clear Chat Memory", type="secondary", use_container_width=True):
                 clear_memory_dialog()
         else:
             # Add dynamic spacer to push the footer to the absolute bottom when chat controls are hidden

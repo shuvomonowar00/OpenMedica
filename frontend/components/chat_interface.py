@@ -8,9 +8,30 @@ def render_chat_messages():
     Iterates through session state chat history and renders each message.
     """
     history = st.session_state.chat_history
+    
+    # Check if the user is currently submitting a prompt
+    is_submitting = bool(st.session_state.get("main_chat_input"))
+    
+    # ---------------------------------------------------------
+    # DYNAMIC EMPTY STATE (ChatGPT Style Center Search)
+    # ---------------------------------------------------------
+    # Only render the empty state if there is no history AND they aren't currently submitting
+    if not history and not is_submitting:
+        st.markdown("""
+        <div style="text-align: center; margin-top: 15vh;">
+            <span class="material-symbols-rounded" style="font-size: 3.5rem; color: #111827; margin-bottom: 10px;">medical_services</span>
+            <h1 style="color: #111827; font-size: 2.2rem; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.5px;">What clinical data do you need?</h1>
+            <p style="color: #64748B; font-size: 1.1rem;">Search across clinical trials, guidelines, and PubMed literature.</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
     for i, msg in enumerate(history):
-        with st.chat_message(msg["role"]):
-            st.markdown(msg["content"], unsafe_allow_html=True)
+        avatar = ":material/person:" if msg["role"] == "user" else ":material/neurology:"
+        with st.chat_message(msg["role"], avatar=avatar):
+            if msg["role"] == "user":
+                st.markdown(f"<div class='user-message-bubble'>{msg['content']}</div>", unsafe_allow_html=True)
+            else:
+                st.markdown(f"<div class='ai-message-bubble'>{msg['content']}</div>", unsafe_allow_html=True)
             
             # If this is an AI message and has raw_data, show export options
             if msg["role"] == "assistant" and msg.get("raw_data"):
@@ -24,7 +45,7 @@ def render_chat_messages():
                 # Render MeSH Search Details for transparency
                 mesh_terms = msg["raw_data"].get("mesh_terms", [])
                 if mesh_terms:
-                    with st.expander("🔍 Search Details"):
+                    with st.expander(":material/search_insights: Search Details"):
                         st.markdown("**Original Query:** " + query)
                         st.markdown("**MeSH Terms Applied:**")
                         for term in mesh_terms:
@@ -34,14 +55,14 @@ def render_chat_messages():
                 col1, col2, col3 = st.columns([1, 1, 3])
                 with col1:
                     st.download_button(
-                        label="📥 Download (.md)",
+                        label=":material/download: Download (.md)",
                         data=md_report,
                         file_name="clinical_report.md",
                         mime="text/markdown",
                         key=f"dl_{i}"
                     )
                 with col2:
-                    with st.popover("📋 View/Copy Note"):
+                    with st.popover(":material/content_copy: View/Copy Note"):
                         st.code(md_report, language="markdown")
                 with col3:
                     # Render Streamlit native feedback
@@ -57,17 +78,17 @@ def handle_chat_input():
     """
     Handles the chat input box and triggers the backend API call.
     """
-    prompt = st.chat_input("Ask a medical question based on PubMed...")
+    prompt = st.chat_input("Ask a medical question based on PubMed...", key="main_chat_input")
     if prompt:
         # 1. Add user message to state
         add_message("user", prompt)
         
         # 2. Render it immediately
-        with st.chat_message("user"):
-            st.markdown(prompt)
+        with st.chat_message("user", avatar=":material/person:"):
+            st.markdown(f"<div class='user-message-bubble'>{prompt}</div>", unsafe_allow_html=True)
             
         # 3. Call backend and render AI response
-        with st.chat_message("assistant"):
+        with st.chat_message("assistant", avatar=":material/neurology:"):
             with st.status("Analyzing clinical query...", expanded=True) as status:
                 st.write("Expanding MeSH terms...")
                 st.write("Retrieving evidence from ChromaDB...")
@@ -93,9 +114,11 @@ def handle_chat_input():
                 status.update(label="Analysis complete!", state="complete", expanded=False)
                 
             if "error" in res:
-                error_msg = f"Sorry, I encountered an error: {res['error']}"
-                st.error(error_msg)
+                error_msg = f"Sorry, I encountered a server error: {res['error']}"
+                wrapped_error = f"<div class='ai-message-bubble' style='color: #ef4444;'>{error_msg}</div>"
+                st.markdown(wrapped_error, unsafe_allow_html=True)
                 add_message("assistant", error_msg)
+                st.rerun()
             else:
                 # Parse Pydantic AI Response (our backend returns structured data)
                 answer = res.get("answer", "No answer provided.")
@@ -134,7 +157,9 @@ def handle_chat_input():
                 
                 full_content += answer
                 
-                st.markdown(full_content, unsafe_allow_html=True)
+                # Wrap it before rendering
+                wrapped_content = f"<div class='ai-message-bubble'>{full_content}</div>"
+                st.markdown(wrapped_content, unsafe_allow_html=True)
                 add_message("assistant", full_content, sources, raw_data=res)
                 
                 # Force a rerun to update the citation panel if needed

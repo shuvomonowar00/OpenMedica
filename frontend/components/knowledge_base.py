@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 from core.api_client import get_cached_database_status, delete_article
 
-@st.dialog("📚 Literature Showcase", width="large")
+@st.dialog(":material/local_library: Literature Showcase", width="large")
 def showcase_literature_modal(article: dict):
     """
     Displays a beautiful pop-up modal showcasing the full abstract and metadata,
@@ -75,16 +75,16 @@ def showcase_literature_modal(article: dict):
     with col1:
         pmid = article.get('pmid')
         if pmid and pmid != "N/A":
-            st.link_button("🔗 Read Full Article on PubMed", f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/")
+            st.link_button(":material/open_in_new: Read Full Article on PubMed", f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/")
             
     with col2:
-        if st.button("🗑️ Delete Article", type="primary", use_container_width=True):
+        if st.button(":material/delete: Delete Article", type="primary", use_container_width=True):
             with st.spinner("Deleting..."):
                 res = delete_article(article.get("pmid"))
                 if "error" in res:
                     st.error(res["error"])
                 else:
-                    st.success("Deleted successfully!")
+                    st.success("Deleted successfully!", icon=":material/check_circle:")
                     get_cached_database_status.clear()
                     st.rerun()
 
@@ -92,7 +92,7 @@ def render_knowledge_base():
     """
     Renders an interactive dataframe of all articles stored in the database.
     """
-    st.header("📚 Knowledge Base Explorer")
+    st.header(":material/local_library: Knowledge Base Explorer")
     st.markdown("Browse all the peer-reviewed PubMed literature currently stored in the vector database.")
     
     status_res = get_cached_database_status()
@@ -178,8 +178,16 @@ def render_knowledge_base():
     # 2. Live Search & Contained Data Table
     # -------------------------------------------------------------
     with st.container(border=True):
-        search_query = st.text_input("🔍 Search Database", placeholder="Filter live by keyword, author, or study type...")
+        # Custom prominent search header
+        st.markdown("<div style='font-weight: 600; font-size: 1.1rem; margin-bottom: 5px; color: #111827;'><span class='material-symbols-rounded' style='vertical-align: middle; margin-right: 8px;'>search</span>Search Knowledge Base</div>", unsafe_allow_html=True)
         
+        search_query = st.text_input(
+            "Search Database", 
+            placeholder="Type to instantly filter by keyword, author, or study type...",
+            label_visibility="collapsed"
+        )
+        
+        st.markdown("<hr style='margin-top: 5px; margin-bottom: 15px; border-color: #E5E7EB;'/>", unsafe_allow_html=True)
         if search_query:
             # Create a mask checking if search_query is in any of the text columns
             mask = display_df.astype(str).apply(lambda x: x.str.contains(search_query, case=False, na=False)).any(axis=1)

@@ -5,7 +5,7 @@ def render_ingestion_page():
     """
     Renders the advanced Data Ingestion Command Center as a full-page tab.
     """
-    st.header("📥 Data Ingestion Command Center")
+    st.header(":material/cloud_download: Data Ingestion Command Center")
     st.markdown("Fetch peer-reviewed medical literature directly from PubMed and embed it into your local vector database.")
     
     with st.container(border=True):
@@ -53,7 +53,7 @@ def render_ingestion_page():
         st.markdown("---")
         
         # Submit Button
-        submit_ingest = st.button("🚀 Start Ingestion Pipeline", type="primary", use_container_width=True)
+        submit_ingest = st.button(":material/rocket_launch: Start Ingestion Pipeline", type="primary", use_container_width=True)
         
         if submit_ingest:
             if not topic.strip():
@@ -82,7 +82,7 @@ def render_ingestion_page():
                     else:
                         articles_added = ingest_res.get('articles_ingested', 0)
                         if articles_added > 0:
-                            st.success(f"🎉 Pipeline Complete! Successfully embedded {articles_added} articles into ChromaDB.")
+                            st.success(f"Pipeline Complete! Successfully embedded {articles_added} articles into ChromaDB.", icon=":material/check_circle:")
                             get_cached_database_status.clear() # Clear cache so DB count updates
                         else:
                             st.warning("Search completed, but no matching articles were found or successfully parsed.")
