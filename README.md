@@ -34,6 +34,8 @@ A live, searchable data grid showing exactly what literature is currently embedd
 The core multi-agent chat interface. The AI strictly extracts Population, Intervention, Comparison, and Outcome (PICO) data from retrieved PubMed literature. Verified citations with evidence-level badges (e.g., RCT, Meta-Analysis) are rendered dynamically in the sidebar.
 
 ![Chat Interface](screenshots/chat-interface.png)
+<br>
+![Chat Interface - Continued](screenshots/chat-interface-2.png)
 
 ---
 
