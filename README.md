@@ -12,7 +12,7 @@
 
 <br>
   
-![OpenMedica Home](screenshots/chat-interface-home.png)
+![OpenMedica Home](screenshots/chat-inference.png)
 
 </div>
 
@@ -23,13 +23,9 @@
 ### 1. Data Ingestion Command Center
 A UI query builder that connects to the PubMed API. Fetch and index clinical abstracts and full-text PMCs directly into the local ChromaDB vector store using boolean filtering.
 
-![Data Ingestion](screenshots/data-ingestion.png)
-
 ### 2. Knowledge Base Explorer
 A searchable data grid displaying the literature currently embedded in the vector database, including publication years, evidence types, and interactive PMC abstracts.
 
-![Knowledge Base Explorer](screenshots/knowledge-base-explorer.png)
-<br>
 ![Knowledge Base Table](screenshots/knowledge-base-table.png)
 <br>
 ![Literature View](screenshots/knowledge-base-literature-show.png)
@@ -37,10 +33,6 @@ A searchable data grid displaying the literature currently embedded in the vecto
 ### 3. Clinical Chat Interface (PICO-Formatted RAG)
 The core multi-agent chat interface. The AI extracts Population, Intervention, Comparison, and Outcome (PICO) data from retrieved PubMed literature. Verified citations with evidence-level badges are rendered dynamically.
 
-![Chat Interface](screenshots/chat-interface.png)
-<br>
-![Chat Interface - Continued](screenshots/chat-interface-2.png)
-<br>
 ![Chat Inference](screenshots/chat-inference.png)
 <br>
 ![Chat Inference - Continued](screenshots/chat-inference-2.png)
@@ -116,7 +108,9 @@ OpenMedica supports dynamic provider switching via a factory pattern. Configure 
 
 ```env
 ACTIVE_LLM_PROVIDER=gemini     # Supported values: gemini, openai, anthropic
-GEMINI_API_KEY=your_api_key
+GEMINI_API_KEY=your_gemini_api_key
+OPENAI_API_KEY=your_openai_api_key
+ANTHROPIC_API_KEY=your_anthropic_api_key
 ```
 Supply the corresponding API key (`GEMINI_API_KEY`, `OPENAI_API_KEY`, or `ANTHROPIC_API_KEY`) for your selected provider.
 
