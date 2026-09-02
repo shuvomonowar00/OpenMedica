@@ -28,8 +28,11 @@ A UI query builder that connects to the PubMed API. Fetch and index clinical abs
 ### 2. Knowledge Base Explorer
 A searchable data grid displaying the literature currently embedded in the vector database, including publication years, evidence types, and interactive PMC abstracts.
 
+**Grid View:** Browse and filter the complete database of indexed medical records.  
 ![Knowledge Base Table](screenshots/knowledge-base-table.png)
 <br>
+
+**Detail View:** Expand any specific record to read the full extracted literature and metadata.  
 ![Literature View](screenshots/knowledge-base-literature-showcase.png)
 
 ### 3. Clinical Chat Interface (PICO-Formatted RAG)
