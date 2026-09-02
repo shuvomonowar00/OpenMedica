@@ -8,11 +8,11 @@
 [![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**A zero-hallucination Medical RAG pipeline strictly grounded in peer-reviewed PubMed literature.**
+**A Medical RAG pipeline grounded in peer-reviewed PubMed literature.**
 
 <br>
   
-![OpenMedica Chat Interface](screenshots/chat-interface.png)
+![OpenMedica Home](screenshots/chat-interface-home.png)
 
 </div>
 
@@ -21,21 +21,29 @@
 ## 📸 Application Showcase
 
 ### 1. Data Ingestion Command Center
-An advanced UI query builder that connects directly to the PubMed API. Easily fetch and index clinical abstracts and full-text PMCs directly into the local ChromaDB vector store with smart boolean filtering.
+A UI query builder that connects to the PubMed API. Fetch and index clinical abstracts and full-text PMCs directly into the local ChromaDB vector store using boolean filtering.
 
 ![Data Ingestion](screenshots/data-ingestion.png)
 
 ### 2. Knowledge Base Explorer
-A live, searchable data grid showing exactly what literature is currently embedded in your vector database, including publication years, evidence types, and interactive PMC abstracts.
+A searchable data grid displaying the literature currently embedded in the vector database, including publication years, evidence types, and interactive PMC abstracts.
 
 ![Knowledge Base Explorer](screenshots/knowledge-base-explorer.png)
+<br>
+![Knowledge Base Table](screenshots/knowledge-base-table.png)
+<br>
+![Literature View](screenshots/knowledge-base-literature-show.png)
 
 ### 3. Clinical Chat Interface (PICO-Formatted RAG)
-The core multi-agent chat interface. The AI strictly extracts Population, Intervention, Comparison, and Outcome (PICO) data from retrieved PubMed literature. Verified citations with evidence-level badges (e.g., RCT, Meta-Analysis) are rendered dynamically in the sidebar.
+The core multi-agent chat interface. The AI extracts Population, Intervention, Comparison, and Outcome (PICO) data from retrieved PubMed literature. Verified citations with evidence-level badges are rendered dynamically.
 
 ![Chat Interface](screenshots/chat-interface.png)
 <br>
 ![Chat Interface - Continued](screenshots/chat-interface-2.png)
+<br>
+![Chat Inference](screenshots/chat-inference.png)
+<br>
+![Chat Inference - Continued](screenshots/chat-inference-2.png)
 
 ---
 
@@ -45,7 +53,7 @@ The core multi-agent chat interface. The AI strictly extracts Population, Interv
 - [Architecture & Tech Stack](#-architecture--tech-stack)
 - [Getting Started](#-getting-started)
   - [Prerequisites](#prerequisites)
-  - [Docker Deployment (Quickstart)](#docker-deployment-quickstart)
+  - [Docker Deployment](#docker-deployment)
   - [Local Development](#local-development)
 - [Project Structure](#-project-structure)
 - [Usage Guide](#-usage-guide)
@@ -56,42 +64,42 @@ The core multi-agent chat interface. The AI strictly extracts Population, Interv
 
 ## 🌟 Overview
 
-**OpenMedica** is an open-source clinical AI assistant designed to solve the critical issue of hallucinations in modern LLMs. Built with an OpenEvidence-style architecture, it combines the vast, peer-reviewed database of PubMed with a strict, Multi-Agent RAG pipeline (powered by Pydantic AI). 
+**OpenMedica** is an open-source clinical AI assistant focused on mitigating hallucinations in large language models. Built using an OpenEvidence-style architecture, it integrates the PubMed database with a Multi-Agent RAG pipeline powered by Pydantic AI.
 
-Every clinical answer is factual, traceable, graded by evidence quality, and strictly grounded in real medical science.
+Clinical responses are designed to be traceable, graded by evidence quality, and grounded in peer-reviewed medical literature.
 
 ## ✨ Key Features
 
-- **Zero Hallucination Guarantee:** Enforced through strict output schemas and a Multi-Agent Verification Pipeline (Synthesizer & Reviewer).
-- **Clinical Evidence UI:** OpenEvidence-style evidence grading (RCTs, Meta-Analyses) and forced **PICO** (Population, Intervention, Comparison, Outcome) formatting.
-- **Advanced Hybrid Search:** Combines semantic ChromaDB Vector search with exact BM25 keyword matching and MeSH term query expansion.
-- **Data Command Center:** An advanced UI Query Builder for live PMC full-text ingestion, chunking, and metadata filtering.
-- **Sidebar Cockpit:** A system health dashboard allowing live, visual tuning of RAG retrieval depth.
-- **Decoupled Architecture:** A robust FastAPI backend communicating seamlessly with a rapid Streamlit frontend.
+- **Multi-Agent Verification Pipeline:** Utilizes Synthesizer and Reviewer agents alongside strict output schemas to improve response accuracy.
+- **Clinical Evidence UI:** Implements OpenEvidence-style grading (e.g., RCTs, Meta-Analyses) and enforces PICO (Population, Intervention, Comparison, Outcome) formatting.
+- **Hybrid Search Capabilities:** Integrates ChromaDB semantic search with BM25 keyword matching and MeSH term query expansion.
+- **Data Ingestion Interface:** Features a UI query builder for PMC full-text ingestion, chunking, and metadata filtering.
+- **System Dashboard:** Includes a sidebar interface for monitoring system health and configuring RAG retrieval depth.
+- **Decoupled Architecture:** Built with a FastAPI backend and a Streamlit frontend.
 
 ## 🏗️ Architecture & Tech Stack
 
 <!-- Placeholder for an Architecture Diagram -->
 > *Diagram Placeholder: User -> Streamlit -> FastAPI -> Pydantic AI (Multi-Agent) -> ChromaDB & PubMed API*
 
-- **Backend:** FastAPI, Python, `uv` (for ultra-fast dependency management).
+- **Backend:** FastAPI, Python, `uv` for dependency management.
 - **Frontend:** Streamlit.
-- **Data Engine:** Biopython (PubMed API), ChromaDB (Vector & Metadata Storage).
+- **Data Engine:** Biopython (PubMed API), ChromaDB.
 - **Agent Framework:** Pydantic AI.
-- **AI Models:** Model-agnostic design (Defaults to Gemini 1.5 Flash/Pro and Gemini Embeddings via Google AI Studio).
+- **AI Models:** Model-agnostic design (Supports Gemini, OpenAI, and Anthropic).
 
 ---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-Before you begin, ensure you have the following installed:
+Ensure the following dependencies are installed:
 - [Docker & Docker Compose](https://www.docker.com/) (Recommended)
 - Git
-- [uv](https://github.com/astral-sh/uv) (If developing locally without Docker)
+- [uv](https://github.com/astral-sh/uv) (If developing locally)
 
 ### 1. Environment Setup
-To run this project locally, you must first configure your API keys and environment variables:
+Configure your API keys and environment variables prior to running the application:
 
 ```bash
 # Clone the repository
@@ -101,21 +109,19 @@ cd OpenMedica
 # Copy the template environment file
 cp .env.example .env
 ```
-Open the newly created `.env` file to configure your keys. 
+Open the `.env` file to configure your keys. 
 
-**🤖 Model Agnostic Design:**
-OpenMedica is built with a dynamic LLM factory. You are **not** locked into a single provider! You can seamlessly switch the entire Multi-Agent pipeline between Google, OpenAI, or Anthropic simply by changing the `ACTIVE_LLM_PROVIDER` variable—zero code changes required:
+**Model Agnostic Configuration:**
+OpenMedica supports dynamic provider switching via a factory pattern. Configure the active LLM provider through environment variables without modifying source code.
 
 ```env
-# Switch between providers instantly:
-ACTIVE_LLM_PROVIDER=gemini      # Uses Gemini 1.5 (Default)
-# ACTIVE_LLM_PROVIDER=openai    # Uses GPT-4o
-# ACTIVE_LLM_PROVIDER=anthropic # Uses Claude 3.5 Sonnet
+ACTIVE_LLM_PROVIDER=gemini     # Supported values: gemini, openai, anthropic
+GEMINI_API_KEY=your_api_key
 ```
-Make sure to also provide the corresponding API key (`GEMINI_API_KEY`, `OPENAI_API_KEY`, or `ANTHROPIC_API_KEY`) for your active provider.
+Supply the corresponding API key (`GEMINI_API_KEY`, `OPENAI_API_KEY`, or `ANTHROPIC_API_KEY`) for your selected provider.
 
-### 2. Docker Deployment (Quickstart)
-The easiest way to run OpenMedica is via our pre-configured Docker containers.
+### 2. Docker Deployment
+Deploy OpenMedica using the provided Docker containers:
 
 ```bash
 docker-compose build
@@ -124,8 +130,8 @@ docker-compose up
 - **Frontend UI:** `http://localhost:8501`
 - **Backend API Docs (Swagger):** `http://localhost:8000/docs`
 
-### 3. Local Development (Advanced)
-If you wish to develop locally and utilize the strict `pyproject.toml` environments:
+### 3. Local Development
+To run the application locally using `uv` environments:
 
 **Terminal 1 (Backend):**
 ```bash
@@ -158,15 +164,15 @@ OpenMedica/
 
 ## 💡 Usage Guide
 
-1. **Ingestion:** Navigate to the main tabs to access the Advanced Query Builder. Define your search parameters, apply MeSH expansion, and pull live abstracts/full-text into the ChromaDB vector store.
-2. **Tuning:** Open the **Sidebar Cockpit** to monitor system health and adjust the RAG retrieval depth slider based on your query complexity.
-3. **Chatting:** Ask clinical questions in the main interface. The Multi-Agent system will parse the query, retrieve grounded evidence, and output a strict PICO-formatted response complete with evidence quality badges.
+1. **Ingestion:** Navigate to the main tabs to access the query builder. Define search parameters, apply MeSH expansion, and pull abstracts or full-text into the ChromaDB vector store.
+2. **Tuning:** Open the sidebar cockpit to monitor system health and adjust the RAG retrieval depth based on query requirements.
+3. **Chat Interface:** Submit clinical questions in the main interface. The Multi-Agent system parses the query, retrieves evidence, and outputs a PICO-formatted response with corresponding citations.
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+Contributions are highly encouraged. To contribute:
 
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
@@ -179,4 +185,4 @@ Contributions are what make the open-source community such an amazing place to l
 ## 📜 License & Acknowledgments
 
 - Distributed under the **MIT License**.
-- Medical abstract data is provided courtesy of the **National Center for Biotechnology Information (NCBI)** / **PubMed** API.
+- Medical abstract data is provided by the **National Center for Biotechnology Information (NCBI)** / **PubMed** API.

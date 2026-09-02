@@ -9,12 +9,10 @@ def render_citation_panel():
     citations = st.session_state.get("current_citations", [])
     
     if not citations:
-        st.markdown("""
-        <div style="border: 1px dashed #D1D5DB; border-radius: 12px; padding: 30px 20px; text-align: center; background-color: #F8FAFC; margin-top: 20px; margin-bottom: 20px;">
-            <span class="material-symbols-rounded" style="font-size: 2rem; color: #94A3B8; margin-bottom: 10px;">article</span>
-            <div style="color: #64748B; font-size: 0.95rem;">Sources will appear here once the AI generates a clinical response.</div>
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown("""<div style="border: 1px dashed #D1D5DB; border-radius: 12px; padding: 30px 20px; text-align: center; background-color: #F8FAFC; margin-top: 20px; margin-bottom: 20px;">
+    <span class="material-symbols-rounded" style="font-size: 2rem; color: #94A3B8; margin-bottom: 10px;">article</span>
+    <div style="color: #64748B; font-size: 0.95rem;">Sources will appear here once the AI generates a clinical response.</div>
+</div>""", unsafe_allow_html=True)
         return
     
     # Render each citation as an interactive styled card
@@ -41,14 +39,12 @@ def render_citation_panel():
                 else:
                     badges_html += f'<span class="badge badge-standard">{pt}</span>'
         
-        card_html = f"""
-        <div class="citation-card" style="margin-bottom: 12px;">
-            <div style="margin-bottom: 8px;">{badges_html}</div>
-            <div class="citation-title"><a href="https://pubmed.ncbi.nlm.nih.gov/{pmid}/" target="_blank">{title} <span class="material-symbols-rounded" style="font-size: 1rem; vertical-align: text-bottom; color: #94A3B8;">open_in_new</span></a></div>
-            <div class="citation-meta"><strong>PMID:</strong> {pmid} | <strong>Year:</strong> {year_str}</div>
-            <div class="citation-meta"><strong>Authors:</strong> {authors}</div>
-        </div>
-        """
+        card_html = f"""<div class="citation-card" style="margin-bottom: 12px;">
+    <div style="margin-bottom: 8px;">{badges_html}</div>
+    <div class="citation-title"><a href="https://pubmed.ncbi.nlm.nih.gov/{pmid}/" target="_blank">{title} <span class="material-symbols-rounded" style="font-size: 1rem; vertical-align: text-bottom; color: #94A3B8;">open_in_new</span></a></div>
+    <div class="citation-meta"><strong>PMID:</strong> {pmid} | <strong>Year:</strong> {year_str}</div>
+    <div class="citation-meta"><strong>Authors:</strong> {authors}</div>
+</div>"""
         html_out += card_html
         
     st.markdown(f"<div style='margin-bottom: -12px;'>{html_out}</div>", unsafe_allow_html=True)
