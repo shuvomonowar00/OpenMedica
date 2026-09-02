@@ -23,6 +23,8 @@
 ### 1. Data Ingestion Command Center
 A UI query builder that connects to the PubMed API. Fetch and index clinical abstracts and full-text PMCs directly into the local ChromaDB vector store using boolean filtering.
 
+![Data Ingestion](screenshots/data-ingestion.png)
+
 ### 2. Knowledge Base Explorer
 A searchable data grid displaying the literature currently embedded in the vector database, including publication years, evidence types, and interactive PMC abstracts.
 
