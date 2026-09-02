@@ -12,7 +12,7 @@
 
 <br>
   
-![OpenMedica Home](screenshots/chat-inference.png)
+![OpenMedica Home](screenshots/chat-interface-home.png)
 
 </div>
 
@@ -28,14 +28,14 @@ A searchable data grid displaying the literature currently embedded in the vecto
 
 ![Knowledge Base Table](screenshots/knowledge-base-table.png)
 <br>
-![Literature View](screenshots/knowledge-base-literature-show.png)
+![Literature View](screenshots/knowledge-base-literature-showcase.png)
 
 ### 3. Clinical Chat Interface (PICO-Formatted RAG)
 The core multi-agent chat interface. The AI extracts Population, Intervention, Comparison, and Outcome (PICO) data from retrieved PubMed literature. Verified citations with evidence-level badges are rendered dynamically.
 
-![Chat Inference](screenshots/chat-inference.png)
+![Chat Interface](screenshots/chat-interface.png)
 <br>
-![Chat Inference - Continued](screenshots/chat-inference-2.png)
+![Chat Interface - Continued](screenshots/chat-interface-2.png)
 
 ---
 
